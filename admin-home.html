@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <!-- dit is de bootstrap link-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+          src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+          alt="WorkingTalent" width="150" 
+          />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="admin-home.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="admin-zoeken.html">Zoeken</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="admin-account.html">Account</a>
+            </li> 
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
+              </li>
+            </ul>
+        </div>
+      </div>
+    </nav>
+
+    <script>
+      function clearLocalStorage() {
+        localStorage.clear();
+      }
+    </script>
+
+    <div class = "user-home-header">
+      <h1>Welkom <span id="WT_NAME"></span>!</h1>
+    </div>
+  
+    <script>
+      document.getElementById("WT_NAME").textContent = localStorage.getItem('WT_NAME');
+    </script>
+
+    <!-- zodra goedgekeurd in reserverings naar gereserveerd. 
+    zodra uitgeleend in gereserveerd naar uitgeleend-->
+
+    <div class="dashboard-container">
+      <h2>Reserveringsverzoeken</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Naam</th>
+            <th scope="col">Boek</th>
+            <th scope="col">Actie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mariska van Hattum</td>
+            <td>Intro to Python</td>
+            <td>
+              <button type="button" class="btn btn-primary">
+                <i class="fa-solid fa-phone"></i>
+                Reserveren
+              </button>
+
+              <button type="button" class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i>
+                Verwijderen
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Nina Wilschut</td>
+            <td>Azure Basics</td>
+            <td>
+              <input type="button" class="btn btn-primary" value="Reserveren">
+              <input type="button" class="btn btn-danger" value="Verwijderen" />
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>Sven Schoonebeek</td>
+            <td>OCA Java Study Guide</td>
+            <td>
+              <input type="button" class="btn btn-primary" value="Reserveren">
+              <input type="button" class="btn btn-danger" value="Verwijderen">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+
+      <h2>Reserveringen</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Naam</th>
+            <th scope="col">Boek</th>
+            <th scope="col">Actie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Quemio Zegwaard</td>
+            <td>Scrum for Dummies</td>
+            <td><input type="button" value="Uitlenen"/> <input type="button" value="Verwijderen" /></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+      
+      <h2>Uitleningen</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Naam</th>
+            <th scope="col">Boek</th>
+            <th scope="col">Actie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Stephen Kwan</td>
+            <td>Spring Framework</td>
+            <td><input type="button" value="Contact"/> <input type="button" value="Stel beschikbaar" /></td>
+          </tr>
+      </tbody>
+      </table>
+
+      <br>
+
+      <h2>Recente reviews</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Naam</th>
+            <th scope="col">Boek</th>
+            <th scope="col">Reactie</th>
+            <th scope="col">Actie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Raoul Schipper</td>
+            <td>Spring Framework</td>
+            <td>Leuk boek!</td>
+            <td><input type="button" value="Verwijderen"/></td>
+          </tr>
+      </tbody>
+    </div>
+    
+    <script src="script.js" defer></script>
+
+    <!-- dit is de bootstrap link-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </body>
+</html>

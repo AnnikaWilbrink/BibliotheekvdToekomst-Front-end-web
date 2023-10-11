@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Working talent library app</title>
+
+    <script>
+      function checkLogin() {
+        const email = document.getElementById("inputEmail").value;
+        const password = document.getElementById("inputPassword").value;
+
+        // Data aanmaken
+        let saveLogin = {
+          // JSON bericht
+          email: email,
+          password: password,
+        };
+
+        // check credentials
+        fetch("http://localhost:8080/user/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(saveLogin),
+        })
+          .then((response) => response.json())
+          .then((loginResponseDto) => {
+            // Hier heb je het antwoord van het inloggen
+
+            if (loginResponseDto.success) {
+              localStorage.setItem("WT_TOKEN", loginResponseDto.token);
+              localStorage.setItem("WT_NAME", loginResponseDto.name);
+              localStorage.setItem("WT_ID", loginResponseDto.userId);
+              localStorage.setItem("WT_ROLE", loginResponseDto.role);
+
+              if (loginResponseDto.role == "admin") {
+                window.location.href = "admin-home.html"; // Redirect for admin
+              } else if (loginResponseDto.role == "user") {
+                window.location.href = "user-home.html"; // Redirect for user
+              } else {
+                alert("Unknown role");
+              }
+            } else {
+              alert("Invalid email or password");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+      }
+    </script>
+
+    <!-- dit is de bootstrap link-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="login-container">
+      <img
+        src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+        class="login-margins"
+      />
+      <div class="row align-items-center">
+        <div class="col-12">
+          <form>
+            <div class="form-group">
+              <div class="login-margins">
+                <label for="exampleInputEmail1">Email address</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="inputEmail"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="login-margins">
+                <label for="exampleInputPassword1">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="inputPassword"
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="checkLogin()"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- dit is de bootstrap link-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

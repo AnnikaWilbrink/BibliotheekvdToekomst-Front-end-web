@@ -1,0 +1,73 @@
+.login-container {
+    align-items: center;
+    margin-top: 10%;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dashboard-container {
+    align-items: center;
+    margin-top: 5%;
+    width: 80%;
+    margin-bottom: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.verzoeken-table th:first-child, .verzoeken-table td:first-child,
+.reservering-table th:first-child, .reservering-table td:first-child,
+.uitleen-table th:first-child, .uitleen-table td:first-child,
+.recente-reviews-table th:first-child, .recente-reviews-table td:first-child {
+    width: 10%; /* Adjust the width as needed */
+}
+
+.verzoeken-table th:not(:first-child), .verzoeken-table td:not(:first-child),
+.reservering-table th:not(:first-child), .reservering-table td:not(:first-child),
+.uitleen-table th:not(:first-child), .uitleen-table td:not(:first-child),
+.recente-reviews-table th:not(:first-child), .recente-reviews-table td:not(:first-child) {
+    width: 30%; /* Adjust the width as needed */
+}
+
+.login-margins{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.title {
+    color: black
+}
+
+.user-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10%;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Style the left half for the carousel */
+.user-carousel-container {
+    flex: .5; /* Occupy half of the container's width */
+}
+
+/* Style the right half for additional content */
+.user-content-container {
+    flex: .5; /* Occupy half of the container's width */
+    background-color: #f0f0f0; /* Background color for the content area */
+    padding: 20px; /* Add padding for content */
+}
+
+/* Style the carousel (you can use your carousel component here) */
+.user-carousel {
+    width: 100%;
+}
+
+.user-home-header{
+    align-items: center;
+    margin-top: 10%;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
