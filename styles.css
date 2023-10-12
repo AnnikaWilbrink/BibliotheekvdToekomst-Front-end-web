@@ -37,6 +37,27 @@
     color: black
 }
 
+.wt-button{
+    display: flex;
+    padding: 12px 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 44px;
+    background: #00E600;
+}
+
+.wt-button-text{
+    color: #000;
+    font-feature-settings: 'calt' off;
+    font-family: Euclid Square;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+
+    letter-spacing: -0.16px;
+}
+
 .container {
     padding: 20px;
 }
@@ -97,4 +118,8 @@
     width: 40%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.ms-n5 {
+    margin-left: -40px;
 }

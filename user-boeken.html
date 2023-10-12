@@ -102,6 +102,7 @@
     </script>
     
     <!-- dit is de bootstrap link-->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css'>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   </head>
   <body>
@@ -145,32 +146,18 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-12 col-md-4">
-          <input id="searchbar" onkeyup="search_book()" type="text"
-          name="search" placeholder="Welk boek zoek je?" class="form-control" />
-        </div>
-  
-        <div class="col-12 col-md-4">
-          <label for="dropdown">Select a Category:</label>
-          <select id="dropdown" name="fruit">
-            <option value="apple">Unspecified</option>
-            <option value="apple">Programmeren</option>
-            <option value="banana">Frameworks</option>
-            <option value="cherry">Business IT</option>
-            <option value="orange">Self Improvement</option>
-            <option value="strawberry">Python</option>
-          </select>
-        </div>
-
-        <div class="col-12 col-md-4">
-          <label for="dropdown">Select a Type:</label>
-          <select id="dropdown" name="fruit">
-            <option value="apple">Unspecified</option>
-            <option value="apple">Physical Book</option>
-            <option value="banana">Ebook</option>
-            <option value="cherry">Audio book</option>
-          </select>
-        </div>
+          <div class="col-md-5 mx-auto">
+              <div class="input-group">
+                  <input class="form-control border-end-0 border rounded-pill" type="search" placeholder="Zoek op titel, auteur of ISBN" id="example-search-input">
+              </div>
+          </div>
+          <div class="col-md-5 mx-auto">
+            <span class="input-group-append">
+              <button class="wt-button tn btn-outline-secondary border-bottom-0 border rounded-pill ms-n5 " type="button">
+                  <p class="wt-button-text">Zoeken</p>
+              </button>
+            </span>
+          </div>
       </div>
     </div>
 
