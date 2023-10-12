@@ -22,7 +22,7 @@
                     <div class="card-body">
                         <h5 class="card-title">${book.title}</h5>
                         <p class="card-text">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
+                            <button class="wt-btn btn-outline-secondary border rounded-pill text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
                                 Meer informatie
                             </button>
                             <div class="collapse" id="collapseExample${book.id}">
@@ -86,8 +86,12 @@
       async function search_book() {
   let input = document.getElementById('search-input').value;
   
-  if (!input) return; // if the input is empty, exit the function
-  
+  if (!input) {
+    getBooks().then(data => {
+      renderBooks(data);
+  });
+  return; // if the input is empty, exit the function after fetching all books
+}
   try {
     const response = await fetch('http://localhost:8080/book/search', {
       method: 'POST',
@@ -162,26 +166,26 @@ document.getElementById('search-input').addEventListener('keypress', function (e
       }
     </script>
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-5 mx-auto">
-      <!-- Enclose the search input and button within a form -->
-      <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
-        <div class="input-group">
-          <input class="form-control border-end-0 border rounded-pill" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
-        </div>
-    </div>
-    <div class="col-md-5 mx-auto">
-      <span class="input-group-append">
-        <button class="wt-button tn btn-outline-secondary border-bottom-0 border rounded-pill ms-n5 " type="submit">
-          <p class="wt-button-text">Zoeken</p>
-        </button>
-      </span>
-    </div>
-      </form>
-  </div>
-</div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5 mx-auto">
 
+          <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
+            <div class="input-group">
+              <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
+              <span class="input-group-append">
+                <button class="wt-btn btn-outline-secondary border rounded-pill text-dark" type="submit">
+                  Zoeken
+                </button>
+              </span>
+            </div>
+            <div>
+              
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <div id="booksContainer"></div>
 
