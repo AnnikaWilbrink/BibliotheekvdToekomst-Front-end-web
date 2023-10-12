@@ -86,8 +86,12 @@
       async function search_book() {
   let input = document.getElementById('search-input').value;
   
-  if (!input) return; // if the input is empty, exit the function
-  
+  if (!input) {
+    getBooks().then(data => {
+      renderBooks(data);
+  });
+  return; // if the input is empty, exit the function after fetching all books
+}
   try {
     const response = await fetch('http://localhost:8080/book/search', {
       method: 'POST',
@@ -165,7 +169,7 @@ document.getElementById('search-input').addEventListener('keypress', function (e
     <div class="container">
       <div class="row">
         <div class="col-md-5 mx-auto">
-          <!-- Enclose the search input and button within a form -->
+
           <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
             <div class="input-group">
               <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
