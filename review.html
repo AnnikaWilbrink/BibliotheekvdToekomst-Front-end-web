@@ -110,14 +110,20 @@
             fetch("http://localhost:8080/review/save", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": localStorage.getItem("WT_TOKEN")
                 },
                 body: JSON.stringify(obj)
             })
-                .then(() => {
+            .then((response) => response.json())
+            .then((success) => {
+                if(success) {
                     alert("Review Opgeslagen")
                     location.reload();
-                })
+                } else {
+                    alert("Er is iets mis gegaan.")
+                }
+            })
         }
 
         function getBookInfo(bookId) {
