@@ -11,6 +11,48 @@
         window.location.href = "user-account.html";
       }
 
+      function renderBooks(data) {
+        let ol = '<div class="row row-cols-auto ">';
+
+        data.forEach(book => {
+            ol += `
+            <div class="col">
+                <div class="card bg-light mb-3 mb-3">
+                    <img src="${book.coverUrl}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">${book.title}</h5>
+                        <p class="card-text">
+                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
+                                Meer informatie
+                            </button>
+                            <div class="collapse" id="collapseExample${book.id}">
+                                <div class="card card-body" style="max-width: 13rem;">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Auteur(s): ${book.author}</li>
+                                        <li class="list-group-item">Onderwerp: ${book.subject}</li>
+                                        <li class="list-group-item">Categorie: ${book.category}</li>
+                                        <li class="list-group-item">ISBN: ${book.isbn}</li>
+                                        <li class="list-group-item">Pagina's: 352</li>
+                                        <li class="list-group-item">Samenvatting: ${book.summary}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link">Reviews</a>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    ol += '</div>';
+
+    const container = document.getElementById('booksContainer');
+    container.innerHTML = ol;
+}
+
+
       // fetch all book from the database
       async function getBooks() {
         try {
@@ -36,68 +78,45 @@
       
       // for all the books that are fetched --> place them in a card in a grid
       getBooks().then(data => {
-        console.log(data);
-
-        let ol = '<div class="row row-cols-auto ">';
-
-        data.forEach(book => {
-          ol += `
-          <div class="col">
-            <div class="card bg-light mb-3 mb-3">
-              <img src="${book.coverUrl}" class="card-img-top" alt="...">
-              <div class="card-body">
-                <h5 class="card-title">${book.title}</h5>
-                <p class="card-text" >
-                  <p>
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
-                      Meer informatie
-                    </button>
-                  </p>
-                  <div class="collapse" id="collapseExample${book.id}">
-                    <div class="card card-body" style="max-width: 13rem;">
-                      <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Auteur(s): ${book.author}</li>
-                        <li class="list-group-item">Onderwerp: ${book.subject}</li>
-                        <li class="list-group-item">Categorie: ${book.category}</li>
-                        <li class="list-group-item">ISBN: ${book.isbn}</li>
-                        <li class="list-group-item">Pagina's: 352</li>
-                        <li class="list-group-item">Samenvatting: ${book.summary}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </p>
-              </div>
-              <div class="card-footer">
-                <a href="#" class="card-link">Reviews</a>
-              </div>
-            </div>
-          </div>
-          `;
-        });
-
-        ol += '</div>';
-
-        const container = document.getElementById('booksContainer');
-        container.innerHTML = ol;
+        renderBooks(data);
       });
 
+
       //search books funciton
-      function search_book() { 
-        let input = document.getElementById('searchbar').value 
-        filter=input.toLowerCase(); 
-        let card = document.getElementsByClassName('card'); 
-          
-        for (i = 0; i < card.length; i++) {  
-          title = card[i].querySelector(".card-title");
-            if (title.innerText.toLowerCase().indexOf(filter) > -1) { 
-              card[i].parentElement.style.display=""; 
-              console.log(title)
-            } 
-            else { 
-              card[i].parentElement.style.display="none";                  
-              } 
-          } 
-      } ;
+      async function search_book() {
+  let input = document.getElementById('search-input').value;
+  
+  if (!input) return; // if the input is empty, exit the function
+  
+  try {
+    const response = await fetch('http://localhost:8080/book/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ searchWord: input })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error! status: ${response.status}`);
+    }
+
+
+    const data = await response.json();
+    renderBooks(data);
+
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Bind the Enter key to the search function
+document.getElementById('search-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      search_book();
+    }
+});
 
     </script>
     
@@ -137,29 +156,32 @@
       </div>
     </nav>
 
-
     <script>
       function clearLocalStorage() {
         localStorage.clear();
       }
     </script>
 
-    <div class="container">
-      <div class="row">
-          <div class="col-md-5 mx-auto">
-              <div class="input-group">
-                  <input class="form-control border-end-0 border rounded-pill" type="search" placeholder="Zoek op titel, auteur of ISBN" id="example-search-input">
-              </div>
-          </div>
-          <div class="col-md-5 mx-auto">
-            <span class="input-group-append">
-              <button class="wt-button tn btn-outline-secondary border-bottom-0 border rounded-pill ms-n5 " type="button">
-                  <p class="wt-button-text">Zoeken</p>
-              </button>
-            </span>
-          </div>
-      </div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-5 mx-auto">
+      <!-- Enclose the search input and button within a form -->
+      <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
+        <div class="input-group">
+          <input class="form-control border-end-0 border rounded-pill" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
+        </div>
     </div>
+    <div class="col-md-5 mx-auto">
+      <span class="input-group-append">
+        <button class="wt-button tn btn-outline-secondary border-bottom-0 border rounded-pill ms-n5 " type="submit">
+          <p class="wt-button-text">Zoeken</p>
+        </button>
+      </span>
+    </div>
+      </form>
+  </div>
+</div>
+
 
     <div id="booksContainer"></div>
 
