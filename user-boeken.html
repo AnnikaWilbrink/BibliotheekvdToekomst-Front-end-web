@@ -10,6 +10,95 @@
       function redirectToPage() {
         window.location.href = "user-account.html";
       }
+
+      // fetch all book from the database
+      async function getBooks() {
+        try {
+        const response = await fetch(
+          'http://localhost:8080/book/all',
+          {
+            method: 'GET',
+          },
+        );
+        
+        //if it doesn't work throw error
+        if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+      }
+      
+      // for all the books that are fetched --> place them in a card in a grid
+      getBooks().then(data => {
+        console.log(data);
+
+        let ol = '<div class="row row-cols-auto ">';
+
+        data.forEach(book => {
+          ol += `
+          <div class="col">
+            <div class="card bg-light mb-3 mb-3">
+              <img src="${book.coverUrl}" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title">${book.title}</h5>
+                <p class="card-text" >
+                  <p>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
+                      Meer informatie
+                    </button>
+                  </p>
+                  <div class="collapse" id="collapseExample${book.id}">
+                    <div class="card card-body" style="max-width: 13rem;">
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Auteur(s): ${book.author}</li>
+                        <li class="list-group-item">Onderwerp: ${book.subject}</li>
+                        <li class="list-group-item">Categorie: ${book.category}</li>
+                        <li class="list-group-item">ISBN: ${book.isbn}</li>
+                        <li class="list-group-item">Pagina's: 352</li>
+                        <li class="list-group-item">Samenvatting: ${book.summary}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </p>
+              </div>
+              <div class="card-footer">
+                <a href="#" class="card-link">Reviews</a>
+              </div>
+            </div>
+          </div>
+          `;
+        });
+
+        ol += '</div>';
+
+        const container = document.getElementById('booksContainer');
+        container.innerHTML = ol;
+      });
+
+      //search books funciton
+      function search_book() { 
+        let input = document.getElementById('searchbar').value 
+        filter=input.toLowerCase(); 
+        let card = document.getElementsByClassName('card'); 
+          
+        for (i = 0; i < card.length; i++) {  
+          title = card[i].querySelector(".card-title");
+            if (title.innerText.toLowerCase().indexOf(filter) > -1) { 
+              card[i].parentElement.style.display=""; 
+              console.log(title)
+            } 
+            else { 
+              card[i].parentElement.style.display="none";                  
+              } 
+          } 
+      } ;
+
     </script>
     
     <!-- dit is de bootstrap link-->
@@ -47,89 +136,45 @@
       </div>
     </nav>
 
+
     <script>
       function clearLocalStorage() {
         localStorage.clear();
       }
     </script>
 
-    <input type="text" placeholder="Welk boek zoek je?" class="search-input" />
-    <label for="dropdown">Select a Category:</label>
-    <select id="dropdown" name="fruit">
-      <option value="apple">Unspecified</option>
-      <option value="apple">Programmeren</option>
-      <option value="banana">Frameworks</option>
-      <option value="cherry">Business IT</option>
-      <option value="orange">Self Improvement</option>
-      <option value="strawberry">Python</option>
-    </select>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-4">
+          <input id="searchbar" onkeyup="search_book()" type="text"
+          name="search" placeholder="Welk boek zoek je?" class="form-control" />
+        </div>
+  
+        <div class="col-12 col-md-4">
+          <label for="dropdown">Select a Category:</label>
+          <select id="dropdown" name="fruit">
+            <option value="apple">Unspecified</option>
+            <option value="apple">Programmeren</option>
+            <option value="banana">Frameworks</option>
+            <option value="cherry">Business IT</option>
+            <option value="orange">Self Improvement</option>
+            <option value="strawberry">Python</option>
+          </select>
+        </div>
 
-    <label for="dropdown">Select a Type:</label>
-    <select id="dropdown" name="fruit">
-      <option value="apple">Unspecified</option>
-      <option value="apple">Physical Book</option>
-      <option value="banana">Ebook</option>
-      <option value="cherry">Audio book</option>
-    </select>
-
-    <div class="card-deck">
-      <div class="card bg-light mb-3 mb-3" style="max-width: 18rem;">
-        <img src="https://res.cloudinary.com/dukp6c7f7/image/upload/f_auto,fl_lossy,q_auto/s3-ghost//2018/11/Pragmatic.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">The Pragmatic Programmer (A. Hunt & D. Thomas)</h5>
-          <p class="card-text" >
-            <p>
-              <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                Meer informatie
-              </button>
-            </p>
-            <div class="collapse" id="collapseExample">
-              <div class="card card-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Auteur(s): A. Hunt & D. Thomas</li>
-                  <li class="list-group-item">ISBN: 23452945820435</li>
-                  <li class="list-group-item">Editie: 2</li>
-                  <li class="list-group-item">Uitgeverij: Addison Wesley</li>
-                  <li class="list-group-item">Pagina's: 352</li>
-                  <li class="list-group-item">Samenvatting: Some quick example text to build on the card title and make up the bulk of the card's content.</li>
-                </ul>
-              </div>
-            </div>
-          </p>
-        </div>
-        <div class="card-footer">
-          <a href="#" class="card-link">Reviews</a>
-        </div>
-      </div>
-      <div class="card bg-light mb-3 mb-3" style="max-width: 18rem;">
-        <img src="https://res.cloudinary.com/dukp6c7f7/image/upload/f_auto,fl_lossy,q_auto/s3-ghost//2018/11/Pragmatic.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">The Pragmatic Programmer (A. Hunt & D. Thomas)</h5>
-          <p class="card-text" >
-            <p>
-              <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample">
-                Meer informatie
-              </button>
-            </p>
-            <div class="collapse" id="collapseExample2">
-              <div class="card card-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Auteur(s): A. Hunt & D. Thomas</li>
-                  <li class="list-group-item">ISBN: 23452945820435</li>
-                  <li class="list-group-item">Editie: 2</li>
-                  <li class="list-group-item">Uitgeverij: Addison Wesley</li>
-                  <li class="list-group-item">Pagina's: 352</li>
-                  <li class="list-group-item">Samenvatting: Some quick example text to build on the card title and make up the bulk of the card's content.</li>
-                </ul>
-              </div>
-            </div>
-          </p>
-        </div>
-        <div class="card-footer">
-          <a href="#" class="card-link">Reviews</a>
+        <div class="col-12 col-md-4">
+          <label for="dropdown">Select a Type:</label>
+          <select id="dropdown" name="fruit">
+            <option value="apple">Unspecified</option>
+            <option value="apple">Physical Book</option>
+            <option value="banana">Ebook</option>
+            <option value="cherry">Audio book</option>
+          </select>
         </div>
       </div>
     </div>
+
+    <div id="booksContainer"></div>
 
 
     <a href="example-book.html" target="_self">Go To Book Example</a>
