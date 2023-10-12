@@ -13,6 +13,7 @@
             color: gray;
             cursor: pointer;
         }
+
         .fa:hover {
             color: orange;
         }
@@ -29,7 +30,7 @@
             <!-- Modal header -->
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="reviewModalLabel">Review Toevoegen</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetForm()"></button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">
@@ -49,7 +50,7 @@
                 <!-- Review text -->
                 <div class="mb-3">
                     <label for="reviewText" class="form-label">Review</label>
-                    <textarea class="form-control" id="reviewText" rows="3" onkeyup="checkEmpty()"></textarea>
+                    <textarea class="form-control" id="reviewText" rows="3" oninput="checkEmpty()"></textarea>
                 </div>
             </div>
 
@@ -62,6 +63,41 @@
       
 
     <script>
+
+        // Check if user clicked a star to enable the save button
+        var starElements = document.querySelectorAll("#rating [data-star]");
+
+        starElements.forEach(function (star) {
+            star.addEventListener("click", function () {
+                var starRating = star.getAttribute("data-star");
+                document.getElementById("rating").setAttribute("data-rating", starRating);
+                checkEmpty();
+            });
+        });
+
+        // Check if user has written a review and clicked a star to enable the save button
+        function checkEmpty() {
+            let reviewText = document.getElementById("reviewText").value;
+            let rating = document.getElementById("rating").getAttribute("data-rating");
+
+            let saveButton = document.getElementById("save-button");
+            saveButton.disabled = reviewText.length <= 0 || rating === "0";
+        }
+
+        // Function to reset the modal after closing it
+        function resetForm() {
+            // Clear the textarea content
+            document.getElementById('reviewText').value = '';
+            
+            // Reset the star rating
+            document.getElementById('rating').setAttribute('data-rating', "0");
+            const stars = document.querySelectorAll('.fa');
+            stars.forEach(star => {
+                star.style.color = 'gray';
+
+            });
+        }
+
         // Add a click event listener to each star icon
         const stars = document.querySelectorAll('.fa');
         stars.forEach(star => {
@@ -82,15 +118,6 @@
                     star.style.color = 'gray';
                 }
             });
-        }
-
-        // Check if user has written a review to enable the save button
-        function checkEmpty(){
-            if(document.getElementById("reviewText").value.length <= 0) {
-                document.getElementById("save-button").disabled = true;
-            } else {
-                document.getElementById("save-button").disabled = false;
-            }
         }
 
         // Save review object in database
@@ -146,7 +173,7 @@
                     let title = bookInfo.title;
                     let coverUrl = bookInfo.coverUrl;
                     bookInfoSection.innerHTML = `<img src="${coverUrl}" width="200" height="300"><h2>${title}, ${authorName}</h2> <br><br>`;
-                    saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+                    saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetForm()">Sluiten</button>
                                             <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`
                 })
         }
