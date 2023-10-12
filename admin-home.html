@@ -11,104 +11,99 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
   <script>
 
-    function deleteRow(button){
-      const row = button.parentNode.parentNode
-      row.parentNode.removeChild(row)
-      return
+    function deleteTables(){
+      const tables = document.querySelectorAll('table');
+      tables.forEach(table => {
+      const headerRow = table.querySelector('thead tr'); 
+      if (headerRow) {
+        const rows = table.querySelectorAll('tbody tr'); 
+        rows.forEach(row => {
+          row.remove();
+        });
+      } else {
+        table.remove();
+      }
+      });
     }
 
-    function moveRow(button){
-      const row = button.parentNode.parentNode
-      const newRow = row.cloneNode(true)
-      document.getElementById("approved").appendChild(newRow)
-      row.parentNode.removeChild(row)
-      return
-    }
-
-    //Build tables with fetched reservation, user and book info
-    function buildTable(reservation, userData, bookData){
-      const table = document.getElementById(reservation.reservationStatus);
-      const newRow = table.querySelector('tbody').insertRow();
-      const cell1 = newRow.insertCell(0)
-      const cell2 = newRow.insertCell(1)
-      const cell3 = newRow.insertCell(2)
-      const cell4 = newRow.insertCell(3)
-      cell1.innerHTML = reservation.id
-      cell2.innerHTML = userData.firstName + " " + userData.lastName
-      cell3.innerHTML = bookData.title
-      cell4.innerHTML = `<button type="button" class="btn btn-primary"><i class="fas fa-check"></i>Approve</button> <button type="button" class="btn btn-danger"><i class="fa-solid fa-trash"></i>Verwijderen</button>`
-      const approveButton = cell4.querySelector('button.btn-primary');
-      const declineButton = cell4.querySelector('button.btn-danger');
-      approveButton.addEventListener('click', () => {
-        fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+    function buildTables(data){
+      data.forEach(reservation => {
+        html = "";
+        html += `
+        <tr>
+          <td>${reservation.id}</td>
+          <td>${reservation.userFirstName} ${reservation.userLastName}</td>
+          <td>${reservation.bookTitle}</td>
+          <td>
+            <button type="button" class="btn btn-primary">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button type="button" class="btn btn-danger">
+              <i class="fa-solid fa-trash"></i> Verwijderen
+            </button>
+          </td>
+        </tr>`;
+        const table = document.getElementById(reservation.reservationStatus);
+        table.insertAdjacentHTML('beforeend', html);
+        const approveButton = table.querySelector('button.btn-primary');
+        const declineButton = table.querySelector('button.btn-danger');
+        approveButton.addEventListener('click', () => {
+          if (reservation.reservationStatus == "unapproved"){
+            newStatus = "approved";
+          }
+          else {
+            newStatus = "borrowed";
+          }
+          fetch(`http://localhost:8080/reservation/${reservation.id}`, {
             method: "PUT",
             headers: {
-                'Content-Type': 'application/json'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              reservationStatus: "approved"
+              reservationStatus: newStatus
             })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Reservation status updated');
+            deleteTables();
+            getReservations();
+          })
+          .catch(error => {
+            console.error('Error updating reservation status:', error);
+          });
         })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
+        declineButton.addEventListener('click', () => {
+          const confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+          if (confirmation){
+            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+              method: "DELETE"
+            })
+            .then(response => {
+              deleteTables();
+              getReservations();
+            })
           }
-          // Return the response to the next .then() block
-          return response.json();
         })
-        .then(data => {
-          // Handle successful response and do something with the data if needed
-          console.log('Reservation status updated:', data);
-
-          // Delete the row and get updated reservations
-          deleteRow(approveButton);
-          getReservations("reservation");
-        })
-        .catch(error => {
-          console.error('Error updating reservation status:', error);
-        });
       })
-      declineButton.addEventListener('click', () => {
-        const confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
-        if (confirmation){
-          fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-            method: "DELETE"
-            })
-          deleteRow(declineButton)
-        }
-      })
-      return
+      return;
     }
 
-      
-    // Triple fetch to get all reservations, user info and book info
-    function getReservations(dataToFetch){
-      fetch(`http://localhost:8080/${dataToFetch}/all`, {
-            method: "GET",
-        })
-            .then(response => response.json())
-            .then(data => {
-              data.forEach(item => {
-                console.log(item);
-                fetch(`http://localhost:8080/user/${item.userId}`, {
-                         method: "GET",
-                          })
-                          .then(response => response.json())
-                          .then(userData => {
-                            console.log(userData)
-                            fetch(`http://localhost:8080/book/${item.bookId}`, {
-                              method: "GET",
-                            })
-                            .then(response => response.json())
-                            .then(bookData => {
-                              console.log(bookData)
-                              buildTable(item, userData, bookData)
-                            });
-                          });
-                        });
-                      });
-            return;
-          }
+    function getReservations(){
+      fetch(`http://localhost:8080/reservation/all`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        buildTables(data)
+      })
+    return;
+    }
   </script>
   
   </head>
@@ -116,18 +111,9 @@
   <body>
     
     <script>
-      // let dataToFetch = "reservation"
+      getReservations()
+    </script>
 
-
-
-
-      getReservations("reservation")
-      getReservations("review")
-
-      
-      // dataToFetch.replace("review"
-      // getReservations(dataToFetch)
-      </script>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
