@@ -42,7 +42,6 @@
 
       function changeEmail() {
         const formData = {
-          token: localStorage.getItem("WT_TOKEN"),
           currentEmail: document.getElementById("current-email").value,
           newEmail: document.getElementById("new-email").value,
           password: document.getElementById("password").value,
@@ -54,6 +53,7 @@
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": localStorage.getItem("WT_TOKEN")
           },
           body: JSON.stringify(formData),
         })
