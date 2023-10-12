@@ -13,6 +13,7 @@
             color: gray;
             cursor: pointer;
         }
+
         .fa:hover {
             color: orange;
         }
@@ -29,7 +30,7 @@
             <!-- Modal header -->
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="reviewModalLabel">Review Toevoegen</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetForm()"></button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">
@@ -62,6 +63,19 @@
       
 
     <script>
+
+        // Function to reset the modal after closing it
+        function resetForm() {
+            // Clear the textarea content
+            document.getElementById('reviewText').value = '';
+            
+            // Reset the star rating
+            const stars = document.querySelectorAll('.fa');
+            stars.forEach(star => {
+                star.style.color = 'gray';
+        });
+    }
+
         // Add a click event listener to each star icon
         const stars = document.querySelectorAll('.fa');
         stars.forEach(star => {
@@ -140,7 +154,7 @@
                     let title = bookInfo.title;
                     let coverUrl = bookInfo.coverUrl;
                     bookInfoSection.innerHTML = `<img src="${coverUrl}" width="200" height="300"><h2>${title}, ${authorName}</h2> <br><br>`;
-                    saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+                    saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetForm()">Sluiten</button>
                                             <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`
                 })
         }
