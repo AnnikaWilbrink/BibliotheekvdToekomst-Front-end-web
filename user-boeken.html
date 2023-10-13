@@ -22,8 +22,8 @@
                     <div class="card-body">
                         <h5 class="card-title">${book.title}</h5>
                         <p class="card-text">
-                            <button class="wt-btn btn-outline-secondary border rounded-pill text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
-                                Meer informatie
+                            <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
+                                Bekijken
                             </button>
                             <div class="collapse" id="collapseExample${book.id}">
                                 <div class="card card-body" style="max-width: 13rem;">
@@ -174,15 +174,24 @@ document.getElementById('search-input').addEventListener('keypress', function (e
             <div class="input-group">
               <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
               <span class="input-group-append">
-                <button class="wt-btn btn-outline-secondary border rounded-pill text-dark" type="submit">
+                <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="submit">
                   Zoeken
                 </button>
               </span>
             </div>
-            <div>
-              
-            </div>
           </form>
+        </div>
+        <div class="col col-lg-2 mx-auto">
+          <div class="dropdown-center">
+            <button class="btn border btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Sorteren
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
+              <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
+              <li><a class="dropdown-item" href="#">Rating</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
