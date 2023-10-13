@@ -45,6 +45,14 @@
     text-align: center;
 }
 
+.boek-toevoegen-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #a1e20b;
+    text-align: center;
+}
+
 .search-margin{
     margin-right: 10px;
 }

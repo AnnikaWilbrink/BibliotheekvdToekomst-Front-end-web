@@ -11,7 +11,6 @@
   </head>
   <body>
 
-
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -32,13 +31,13 @@
               <a class="nav-link" href="admin-zoeken.html">Zoeken</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
+              <a class="nav-link active" aria-current="page" href="admin-statistieken.html">Statistieken</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="admin-book-management.html">Boek management</a>
-          </li>
+                <a class="nav-link active" aria-current="page" href="admin-book-management.html">Boek management</a>
+            </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href=""admin-account.html">Account</a>
+              <a class="nav-link" href="admin-account.html">Account</a>
             </li> 
             <ul class="navbar-nav">
               <li class="nav-item">
@@ -48,15 +47,32 @@
         </div>
       </div>
     </nav>
-    <a href="change-password.html" target="_self">Verander Wachtwoord</a>
-    <a href="change-email.html" target="_self">Verander Email</a>
-    <a href="change-phone-number.html" target="_self">Verander Telefoon Nummer</a>
 
-    <script>
-      function clearLocalStorage() {
-        localStorage.clear();
-      }
-    </script>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 mx-auto">
+    
+                <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
+                    <div class="input-group">
+                        <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
+                        <span class="input-group-append">
+                            <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="submit">
+                                Zoeken
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+    
+            <div class="col col-lg-2 mx-auto">
+                <button class="boek-toevoegen-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="window.location.href='admin-append-book.html';">
+                    Toevoegen
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    
 
     <script src="script.js" defer></script>
     <!-- dit is de bootstrap link-->
