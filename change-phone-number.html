@@ -15,50 +15,46 @@
     />
   </head>
   <body>
-    <form id="changePasswordForm" class="container">
+    <form id="changePhoneNumberForm" class="container">
       <div class="mb-3">
-        <label for="current-password" class="form-label"
-          >Current Password</label
+        <label for="current-phone-number" class="form-label"
+          >Huidig Telefoon Nummer</label
         >
-        <input type="password" class="form-control" id="current-password" />
+        <input type="tel" class="form-control" id="current-phone-number" />
       </div>
       <div class="mb-3">
-        <label for="new-password" class="form-label">New Password</label>
-        <input type="password" class="form-control" id="new-password" />
-      </div>
-      <div class="mb-3">
-        <label for="confirm-new-password" class="form-label"
-          >Confirm New Password</label
+        <label for="new-phone-number" class="form-label"
+          >Nieuw Telefoon Nummer</label
         >
-        <input type="password" class="form-control" id="confirm-new-password" />
+        <input type="tel" class="form-control" id="new-phone-number" />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Wachtwoord</label>
+        <input type="password" class="form-control" id="password" />
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
     <script>
       document
-        .getElementById("changePasswordForm")
+        .getElementById("changePhoneNumberForm")
         .addEventListener("submit", function (event) {
           event.preventDefault();
-          changePassword();
+          changePhoneNumber();
         });
 
-      function changePassword() {
-        const confirmNewPassword = document.getElementById(
-          "confirm-new-password"
-        ).value;
-
+      function changePhoneNumber() {
         const formData = {
-          currentPassword: document.getElementById("current-password").value,
-          newPassword: document.getElementById("new-password").value,
+          currentPhoneNumber: document.getElementById("current-phone-number")
+            .value,
+          newPhoneNumber: document.getElementById("new-phone-number").value,
+          password: document.getElementById("password").value,
         };
 
-        if (formData.newPassword != confirmNewPassword) {
-          alert("New password and confirm new password do not match");
-          return;
-        }
+        console.log(formData);
 
-        fetch("http://localhost:8080/user/changePassword", {
+        fetch("http://localhost:8080/user/changePhoneNumber", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -69,10 +65,10 @@
           .then((response) => response.json())
           .then((success) => {
             if (success == 1) {
-              alert("Password changed successfully");
+              alert("Phone Number changed successfully");
               window.history.back();
             } else {
-              alert("Invalid email or password");
+              alert("Invalid current phone number or password");
             }
           })
           .catch((error) => console.error("Error fetching users:", error));
