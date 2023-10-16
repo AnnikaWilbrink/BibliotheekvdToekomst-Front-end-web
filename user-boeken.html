@@ -21,36 +21,25 @@
                     <img src="${book.coverUrl}" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">${book.title}</h5>
-                        <p class="card-text">
-                            <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample${book.id}" aria-expanded="false" aria-controls="collapseExample">
-                                Bekijken
-                            </button>
-                            <div class="collapse" id="collapseExample${book.id}">
-                                <div class="card card-body" style="max-width: 13rem;">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">Auteur(s): ${book.author}</li>
-                                        <li class="list-group-item">Onderwerp: ${book.subject}</li>
-                                        <li class="list-group-item">Categorie: ${book.category}</li>
-                                        <li class="list-group-item">ISBN: ${book.isbn}</li>
-                                        <li class="list-group-item">Pagina's: 352</li>
-                                        <li class="list-group-item">Samenvatting: ${book.summary}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </p>
+                        <p>Rating:</p>
                     </div>
                     <div class="card-footer">
-                        <a href="#" class="card-link">Reviews</a>
+                      <a class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" href="boek-pagina.html">
+                        Bekijken
+                      </a>
+                      <button class="fav-btn border rounded-pill" id="fav">
+                        <i class="bi bi-heart"></i>
+                      </button>
                     </div>
                 </div>
             </div>`;
-    });
+          });
 
-    ol += '</div>';
+          ol += '</div>';
 
-    const container = document.getElementById('booksContainer');
-    container.innerHTML = ol;
-}
+          const container = document.getElementById('booksContainer');
+          container.innerHTML = ol;
+      }
 
 
       // fetch all book from the database
@@ -84,51 +73,92 @@
 
       //search books funciton
       async function search_book() {
-  let input = document.getElementById('search-input').value;
-  
-  if (!input) {
-    getBooks().then(data => {
-      renderBooks(data);
-  });
-  return; // if the input is empty, exit the function after fetching all books
-}
-  try {
-    const response = await fetch('http://localhost:8080/book/search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ searchWord: input })
-    });
+        let input = document.getElementById('search-input').value;
+        
+        if (!input) {
+          getBooks().then(data => {
+            renderBooks(data);
+        });
+        return; // if the input is empty, exit the function after fetching all books
+      }
+        try {
+          const response = await fetch('http://localhost:8080/book/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ searchWord: input })
+          });
 
-    if (!response.ok) {
-      throw new Error(`Error! status: ${response.status}`);
-    }
-
-
-    const data = await response.json();
-    renderBooks(data);
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
 
 
-  } catch (error) {
-    console.log(error);
-  }
-}
+          const data = await response.json();
+          renderBooks(data);
 
-// Bind the Enter key to the search function
-document.getElementById('search-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-      search_book();
-    }
-});
+
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      // Bind the Enter key to the search function
+      document.getElementById('search-input').addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            search_book();
+          }
+      });
+
+      
+      //filter books funciton
+      async function filter_books() {
+        let input = document.getElementById('filter-input').value;
+        
+        if (!input) {
+          getBooks().then(data => {
+            renderBooks(data);
+        });
+        return; // if the input is empty, exit the function after fetching all books
+      }
+        try {
+          // hier de filter functie
+          // TODO
+          const response = await fetch('http://localhost:8080/book/filter', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            //hier moet de checklist gelinkt worden
+            // TODO 
+            body: JSON.stringify({ filterWord: input })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+
+
+          const data = await response.json();
+          renderBooks(data);
+
+
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
 
     </script>
     
     <!-- dit is de bootstrap link-->
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css'>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   </head>
   <body>
+
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
@@ -166,37 +196,99 @@ document.getElementById('search-input').addEventListener('keypress', function (e
       }
     </script>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-md-5 mx-auto">
 
-          <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
-            <div class="input-group">
-              <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
-              <span class="input-group-append">
-                <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="submit">
-                  Zoeken
-                </button>
-              </span>
+    <div class="parent-container d-flex">
+      <!-- linker container-->
+      <div class="container-side">
+        <div class="row-side">
+            <div class="flowers-wrap">
+              <p class=" border-bottom"><strong>Onderwerp</strong></p>
+              <form id="filterForm" onsubmit="event.preventDefault(); filter_books();">
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="tiny" id="filter-input" /> Tiny</label><br>
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="small" id="filter-input" /> Small</label><br>
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="medium" id="filter-input" /> Medium</label><br> 
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="large" id="filter-input" /> Large</label><br>
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="giant" id="filter-input" /> Giant</label>
+              
+              
+
+              <p class=" border-bottom"><strong>Boek, e-boek of luisterboek?</strong></p>
+              
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="boek" id="filter-input" /> Boek</label><br>
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="e-boek" id="filter-input" /> E-boek</label><br> 
+                <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="luister" id="filter-input" /> Luister boek</label><br>                     
+              
+
+
+              <p class=" border-bottom"><strong>Beschikbaarheid</strong></p>
+              <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="tiny" id="filter-input" /> Beschikbaar</label><br>
+              <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="small" id="filter-input" /> Gereserveerd</label><br>
+              <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="medium" id="filter-input" /> Uitgeleend</label><br> 
+
+
+              <p class=" border-bottom"><strong>Minimale beoordeling</strong></p>
+              
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="zero" id="filter-input" checked /> 
+                  <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                </div>
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="one" id="filter-input" />
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+                </div>
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="two" id="filter-input" />
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+                </div>
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="three" id="filter-input" />
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+                </div>
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="four" id="filter-input" />
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> of hoger
+                </div>
+                <div><input class="form-check-input me-1" type="radio" name="bk-rating" value="five" id="filter-input" />
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>         
+              </form>
             </div>
-          </form>
         </div>
-        <div class="col col-lg-2 mx-auto">
-          <div class="dropdown-center">
-            <button class="btn border btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Sorteren
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
-              <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
-              <li><a class="dropdown-item" href="#">Rating</a></li>
-            </ul>
+      </div>
+
+      <!-- rechter container-->
+      <div class="container">
+
+        <div class="row">
+          <div class="col-md-8 mx-auto">
+            <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
+              <div class="input-group">
+                <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
+                <span class="input-group-append">
+                  <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="submit">
+                    Zoeken
+                  </button>
+                </span>
+              </div>
+            </form>
+          </div>
+          <div class="col col-lg-2 mx-auto">
+            <div class="dropdown-center">
+              <button class="btn border btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Sorteren
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
+                <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
+                <li><a class="dropdown-item" href="#">Rating</a></li>
+              </ul>
+            </div>
           </div>
         </div>
+
+        <div class="row">
+          <div id="booksContainer"></div>
+        </div>
+
       </div>
     </div>
 
-    <div id="booksContainer"></div>
+
 
 
     <a href="example-book.html" target="_self">Go To Book Example</a>
