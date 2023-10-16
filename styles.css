@@ -55,16 +55,28 @@ body {
     text-align: center;
 }
 
-
-
 .btn-primary {
-    color: #00E600 !important;
+    color: #000 !important;
     background-color: #00E600 !important;
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    color: #000 !important;
+    background-color: #6E757C !important;
+}
+
+.btn-greyscale {
+    color: #fff !important;
+    background-color: #737D94 !important;
+}
+
+.btn-greyscale:hover, .btn-greyscale:focus, .btn-greyscale:active, .btn-greyscale.active, .open>.dropdown-toggle.btn-greyscale {
     color: #fff !important;
     background-color: #6E757C !important;
+}
+
+.btn-danger{
+    color: #fff !important;
 }
 
 .search-margin{

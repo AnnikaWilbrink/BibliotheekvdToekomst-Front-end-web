@@ -28,6 +28,7 @@
 
     function buildTables(data){
       data.forEach(reservation => {
+        defaultColors = ["primary", "danger"]
         switch(reservation.reservationStatus){
           case "unapproved": 
             approveButtonText = "Goedkeuren";
@@ -40,6 +41,7 @@
           case "borrowed":
             approveButtonText = "Contact";
             declineButtonText = "Stel beschikbaar";
+            defaultColors = ["greyscale", "greyscale"]
             break;
         }
         html = "";
@@ -49,10 +51,10 @@
           <td>${reservation.userFirstName} ${reservation.userLastName}</td>
           <td>${reservation.bookTitle}</td>
           <td>
-            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" id="approve_${reservation.id}">
+            <button type="button" class="btn btn-${defaultColors[0]} btn-outline-secondary border rounded-pill fw-bold" id="approve_${reservation.id}">
               ${approveButtonText}
             </button>
-            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold text-white" id="decline_${reservation.id}">
+            <button type="button" class="btn btn-${defaultColors[1]} btn-outline-secondary border rounded-pill fw-bold" id="decline_${reservation.id}">
               ${declineButtonText}
             </button>
           </td>
