@@ -15,6 +15,10 @@ body {
     margin-right: auto;
 }
 
+.noHover{
+    pointer-events: none;
+}
+
 .dashboard-container {
     align-items: center;
     margin-top: 5%;
@@ -75,8 +79,23 @@ body {
     background-color: #6E757C !important;
 }
 
+.btn-icegrey{
+    color:#fff !important;
+    background-color: #AEB4C1 !important;
+}
+
 .btn-danger{
     color: #fff !important;
+}
+
+.btn-black{
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
+.btn-black:hover, .btn-black:focus, .btn-black:active, .btn-black.active, .open>.dropdown-toggle.btn-black {
+    color: #fff !important;
+    background-color: #6E757C !important;
 }
 
 .search-margin{
