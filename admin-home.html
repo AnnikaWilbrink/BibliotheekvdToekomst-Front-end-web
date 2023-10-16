@@ -28,17 +28,19 @@
 
     function buildTables(data){
       data.forEach(reservation => {
-        if (reservation.reservationStatus == "unapproved"){
-          approveButtonText = "Goedkeuren"
-          declineButtonText = "Afkeuren"
-        }
-        if (reservation.reservationStatus == "approved"){
-          approveButtonText = "Uitlenen"
-          declineButtonText = "Verwijderen"
-        }
-        if (reservation.reservationStatus == "borrowed") {
-          approveButtonText = "Contact"
-          declineButtonText = "Stel beschikbaar"
+        switch(reservation.reservationStatus){
+          case "unapproved": 
+            approveButtonText = "Goedkeuren";
+            declineButtonText = "Afkeuren";
+            break;
+          case "approved":
+            approveButtonText = "Uitlenen";
+            declineButtonText = "Verwijderen";
+            break;
+          case "borrowed":
+            approveButtonText = "Contact";
+            declineButtonText = "Stel beschikbaar";
+            break;
         }
         html = "";
         html += `
@@ -47,18 +49,18 @@
           <td>${reservation.userFirstName} ${reservation.userLastName}</td>
           <td>${reservation.bookTitle}</td>
           <td>
-            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold">
+            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" id="approve_${reservation.id}">
               ${approveButtonText}
             </button>
-            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold text-white">
+            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold text-white" id="decline_${reservation.id}">
               ${declineButtonText}
             </button>
           </td>
         </tr>`;
         const table = document.getElementById(reservation.reservationStatus);
         table.insertAdjacentHTML('beforeend', html);
-        const approveButton = table.querySelector('button.btn-primary');
-        const declineButton = table.querySelector('button.btn-danger');
+        const approveButton = table.querySelector(`#approve_${reservation.id}`);
+        const declineButton = table.querySelector(`#decline_${reservation.id}`);
         approveButton.addEventListener('click', () => {
           if (reservation.reservationStatus == "unapproved"){
             newStatus = "approved";
@@ -91,7 +93,17 @@
           });
         })
         declineButton.addEventListener('click', () => {
-          const confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+          switch(reservation.reservationStatus){
+          case "unapproved": 
+            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
+            break;
+          case "approved":
+            confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+            break;
+          case "borrowed":
+            confirmation = confirm("Weet je zeker dat je dit boek weer beschikbaar wilt stellen?")
+            break;
+        }
           if (confirmation){
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
               method: "DELETE"
