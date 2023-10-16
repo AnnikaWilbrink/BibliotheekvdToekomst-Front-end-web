@@ -1,3 +1,12 @@
+@font-face {
+    font-family: "Euclid";
+    src: url("https://fontsforyou.com/fonts/e/Euclid.ttf");
+}
+
+body {
+    font-family: "Euclid";
+}
+
 .login-container {
     align-items: center;
     margin-top: 10%;
@@ -33,6 +42,7 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 .title {
     color: black
 }
@@ -43,6 +53,18 @@
     align-items: center;
     background: #00E600;
     text-align: center;
+}
+
+
+
+.btn-primary {
+    color: #00E600 !important;
+    background-color: #00E600 !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    color: #fff !important;
+    background-color: #6E757C !important;
 }
 
 .search-margin{

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
@@ -28,6 +28,18 @@
 
     function buildTables(data){
       data.forEach(reservation => {
+        if (reservation.reservationStatus == "unapproved"){
+          approveButtonText = "Goedkeuren"
+          declineButtonText = "Afkeuren"
+        }
+        if (reservation.reservationStatus == "approved"){
+          approveButtonText = "Uitlenen"
+          declineButtonText = "Verwijderen"
+        }
+        if (reservation.reservationStatus == "borrowed") {
+          approveButtonText = "Contact"
+          declineButtonText = "Stel beschikbaar"
+        }
         html = "";
         html += `
         <tr>
@@ -35,11 +47,11 @@
           <td>${reservation.userFirstName} ${reservation.userLastName}</td>
           <td>${reservation.bookTitle}</td>
           <td>
-            <button type="button" class="btn btn-primary">
-              <i class="fas fa-check"></i> Approve
+            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold">
+              ${approveButtonText}
             </button>
-            <button type="button" class="btn btn-danger">
-              <i class="fa-solid fa-trash"></i> Verwijderen
+            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold text-white">
+              ${declineButtonText}
             </button>
           </td>
         </tr>`;
@@ -104,6 +116,7 @@
       })
     return;
     }
+    
   </script>
   
   </head>
@@ -148,18 +161,18 @@
       </div>
     </nav>
 
-    <!-- zodra goedgekeurd in reserverings naar gereserveerd. 
-    zodra uitgeleend in gereserveerd naar uitgeleend-->
+    
 
     <div class="dashboard-container">
-      <h2>Reserveringsverzoeken</h2>
+      <h1>Jouw dashboard</h1>
+      <h4>Reserveringsverzoeken</h4>
       <table class="table table-striped" id = "unapproved">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
@@ -168,14 +181,14 @@
 
       <br>
 
-      <h2>Reserveringen</h2>
+      <h4>Reserveringen</h4>
       <table class="table table-striped" id = "approved">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
@@ -184,35 +197,20 @@
 
       <br>
       
-      <h2>Uitleningen</h2>
+      <h4>Uitleningen</h4>
       <table class="table table-striped" id = "borrowed">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
       </tbody>
       </table>
 
-      <br>
-
-      <h2>Recente reviews</h2>
-      <table class="table table-striped" id = "recent-reviews">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Reactie</th>
-            <th scope="col">Actie</th>
-          </tr>
-        </thead>
-        <tbody>
-      </tbody>
     </div>
     
     <script src="script.js" defer></script>
