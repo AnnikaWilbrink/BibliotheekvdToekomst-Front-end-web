@@ -53,6 +53,14 @@
     text-align: center;
 }
 
+.verwijder-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #e20b0b;
+    text-align: center;
+}
+
 .search-margin{
     margin-right: 10px;
 }
