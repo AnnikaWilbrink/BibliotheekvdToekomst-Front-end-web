@@ -54,7 +54,7 @@
       </div>
     </nav>
 
-    <div class="container vh-100 d-flex align-items-center justify-content-center">
+<div class="container vh-100 d-flex align-items-center justify-content-center" style="margin-top: 80px;">
         <div class="row w-100">
             <div class="col-12 d-flex justify-content-between align-items-center">
                 <h1>Nieuwe boek toevoegen</h1>
@@ -62,7 +62,7 @@
             <div class="col-md-8 mx-auto">
                 <form action="http://localhost:8080/book/save" method="post">
                     <div class="form-group">
-                    
+                      
                         <label for="title">Title:</label>
                         <input type="text" id="title" name="title" class="form-control" required><br>
 
@@ -90,10 +90,10 @@
                         <label for="summary">Summary:</label>
                         <textarea id="summary" name="summary" class="form-control" rows="7" required></textarea><br>
 
-                        <label for="imageUrl">Image URL:</label><br>
-                        <input type="url" id="imageUrl" name="imageUrl" oninput="displayImage()" class="form-control" required><br>
+                        <label for="coverUrl">Cover URL:</label><br>
+                        <input type="url" id="coverUrl" name="coverUrl" oninput="displayImage()" class="form-control" required><br>
                 
-                        <img id="coverPreview" style="max-width: 300px;"><br>
+                        <img id="coverPreview" style="max-width: 300px;"><br><br>
                         
                         <button class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="submitForm()">
                             Aanmaken
@@ -113,8 +113,56 @@
 
 <script>
 
+function submitForm() {
+    // Collect data from the form fields
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const isbn = document.getElementById('isbn').value;
+    const subject = document.getElementById('subject').value;
+    const edition = document.getElementById('edition').value;
+    const category = document.getElementById('category').value;
+    const availability = document.getElementById('availability').value;
+    const summary = document.getElementById('summary').value;
+    const coverUrl = document.getElementById('coverUrl').value;
+
+    // Create a data object to send
+    const formData = {
+        title: title,
+        author: author,
+        isbn: isbn,
+        subject: subject,
+        edition: edition,
+        category: category,
+        availablity: availability,  
+        summary: summary,
+        coverUrl: coverUrl 
+    };
+
+    fetch('http://localhost:8080/book/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {  
+            alert('Book saved successfully!');
+            window.location.href = 'admin-book-management.html';
+        } else {
+            alert('There was an error saving the book. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error saving the book. Please check the console for more details.');
+    });
+}
+
+
 function displayImage() {
-    var url = document.getElementById('imageUrl').value;
+    var url = document.getElementById('coverUrl').value;
     document.getElementById('coverPreview').src = url;
 }
 
