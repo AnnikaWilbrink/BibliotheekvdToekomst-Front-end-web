@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
@@ -28,6 +28,22 @@
 
     function buildTables(data){
       data.forEach(reservation => {
+        defaultColors = ["primary", "danger"]
+        switch(reservation.reservationStatus){
+          case "unapproved": 
+            approveButtonText = "Goedkeuren";
+            declineButtonText = "Afkeuren";
+            break;
+          case "approved":
+            approveButtonText = "Uitlenen";
+            declineButtonText = "Verwijderen";
+            break;
+          case "borrowed":
+            approveButtonText = "Contact";
+            declineButtonText = "Stel beschikbaar";
+            defaultColors = ["greyscale", "greyscale"]
+            break;
+        }
         html = "";
         html += `
         <tr>
@@ -35,18 +51,18 @@
           <td>${reservation.userFirstName} ${reservation.userLastName}</td>
           <td>${reservation.bookTitle}</td>
           <td>
-            <button type="button" class="btn btn-primary">
-              <i class="fas fa-check"></i> Approve
+            <button type="button" class="btn btn-${defaultColors[0]} btn-outline-secondary border rounded-pill fw-bold" id="approve_${reservation.id}">
+              ${approveButtonText}
             </button>
-            <button type="button" class="btn btn-danger">
-              <i class="fa-solid fa-trash"></i> Verwijderen
+            <button type="button" class="btn btn-${defaultColors[1]} btn-outline-secondary border rounded-pill fw-bold" id="decline_${reservation.id}">
+              ${declineButtonText}
             </button>
           </td>
         </tr>`;
         const table = document.getElementById(reservation.reservationStatus);
         table.insertAdjacentHTML('beforeend', html);
-        const approveButton = table.querySelector('button.btn-primary');
-        const declineButton = table.querySelector('button.btn-danger');
+        const approveButton = table.querySelector(`#approve_${reservation.id}`);
+        const declineButton = table.querySelector(`#decline_${reservation.id}`);
         approveButton.addEventListener('click', () => {
           if (reservation.reservationStatus == "unapproved"){
             newStatus = "approved";
@@ -79,7 +95,17 @@
           });
         })
         declineButton.addEventListener('click', () => {
-          const confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+          switch(reservation.reservationStatus){
+          case "unapproved": 
+            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
+            break;
+          case "approved":
+            confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+            break;
+          case "borrowed":
+            confirmation = confirm("Weet je zeker dat je dit boek weer beschikbaar wilt stellen?")
+            break;
+        }
           if (confirmation){
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
               method: "DELETE"
@@ -104,6 +130,7 @@
       })
     return;
     }
+    
   </script>
   
   </head>
@@ -151,18 +178,18 @@
       </div>
     </nav>
 
-    <!-- zodra goedgekeurd in reserverings naar gereserveerd. 
-    zodra uitgeleend in gereserveerd naar uitgeleend-->
+    
 
     <div class="dashboard-container">
-      <h2>Reserveringsverzoeken</h2>
+      <h1>Jouw dashboard</h1>
+      <h4>Reserveringsverzoeken</h4>
       <table class="table table-striped" id = "unapproved">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
@@ -171,14 +198,14 @@
 
       <br>
 
-      <h2>Reserveringen</h2>
+      <h4>Reserveringen</h4>
       <table class="table table-striped" id = "approved">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
@@ -187,35 +214,20 @@
 
       <br>
       
-      <h2>Uitleningen</h2>
+      <h4>Uitleningen</h4>
       <table class="table table-striped" id = "borrowed">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Actie</th>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
         <tbody>
       </tbody>
       </table>
 
-      <br>
-
-      <h2>Recente reviews</h2>
-      <table class="table table-striped" id = "recent-reviews">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Boek</th>
-            <th scope="col">Reactie</th>
-            <th scope="col">Actie</th>
-          </tr>
-        </thead>
-        <tbody>
-      </tbody>
     </div>
     
     <script src="script.js" defer></script>
