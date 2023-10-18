@@ -43,6 +43,9 @@
             declineButtonText = "Stel beschikbaar";
             defaultColors = ["greyscale", "greyscale"]
             break;
+          case "deleted":
+            return;
+            break;
         }
         html = "";
         html += `
@@ -108,8 +111,14 @@
         }
           if (confirmation){
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-              method: "DELETE"
+            method: "PUT",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              reservationStatus: "deleted"
             })
+          })
             .then(response => {
               deleteTables();
               getReservations();
