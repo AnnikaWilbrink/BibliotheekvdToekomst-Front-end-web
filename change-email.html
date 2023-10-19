@@ -53,7 +53,7 @@
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": localStorage.getItem("WT_TOKEN")
+            Authorization: localStorage.getItem("WT_TOKEN"),
           },
           body: JSON.stringify(formData),
         })
