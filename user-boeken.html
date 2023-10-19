@@ -75,7 +75,7 @@
             <!-- Stars -->
             <p class=" border-bottom"><strong>Minimale beoordeling</strong></p>
             
-            <div><input class="form-check-input me-1" type="radio" name="review-rating" value="0" id="rating-0" checked /> 
+            <div><input class="form-check-input me-1" type="radio" name="review-rating" value="0" id="rating-0"  /> 
               <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="1" id="rating-1" />
@@ -141,6 +141,11 @@
     <script>
       function redirectToPage() {
         window.location.href = "user-account.html";
+        renderBooks(data);
+      }
+
+      function makeLocalStorage(id){
+        localStorage.setItem("WT_book", id)
       }
 
       function renderBooks(data) {
@@ -156,7 +161,7 @@
                         <p>Rating:</p>
                     </div>
                     <div class="card-footer">
-                      <a class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" href="boek-pagina.html">
+                      <a class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" href="boek-pagina.html" onclick="makeLocalStorage(${book.id})">
                         Bekijken
                       </a>
                       <button class="fav-btn border rounded-pill" id="fav">
@@ -190,6 +195,7 @@
         }
 
         const data = await response.json();
+        console.log(data)
 
         return data;
       } catch (error) {
@@ -205,7 +211,7 @@
       // Bind the Enter key to the search function
       document.getElementById('search-input').addEventListener('keypress', function (e) {
           if (e.key === 'Enter') {
-            search_book();
+            filter_books();
           }
       });
 
@@ -224,12 +230,12 @@
           searchDto.filterWord = searchInput;
         }
 
-        // 2 - Ratin
+        // 2 - Rating
         let searchRating = document.querySelector('input[name="review-rating"]:checked')?.value;
         if (!!searchRating) {
           searchDto.minReviewScore = parseInt(searchRating);
         }
-       
+      
         try {
           // hier de filter functie
           // TODO
@@ -244,7 +250,6 @@
           if (!response.ok) {
             throw new Error(`Error! status: ${response.status}`);
           }
-
 
           const data = await response.json();
           renderBooks(data);

@@ -103,6 +103,8 @@ body {
     align-items: center;
     background: #e20b0b;
     text-align: center;
+}
+    
 .btn-primary {
     color: #000 !important;
     background-color: #00E600 !important;
@@ -237,4 +239,3 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-

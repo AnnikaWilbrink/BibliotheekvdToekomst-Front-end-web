@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 </head>
-<body>
+<body onload=getBook(id)>
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
@@ -44,7 +44,84 @@
         </div>
         </nav>
 
-        
+        <div class="parent-container d-flex">
+            <!-- linker container-->
+            <div id="bookContainer">
+                <h1></h1>
+
+            </div>
+
+            <!-- rechter container-->
+            <div>
+
+            </div>
+        </div>
+
+
+        <script>
+            id = localStorage.getItem('WT_book');
+            console.log(id)
+
+            
+            async function getBook(id) {
+                try {
+                const response = await fetch(`http://localhost:8080/book/info/${id}`, {
+                method: 'GET',
+                });
+                
+                //if it doesn't work throw error
+                if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data)
+                return data;
+                } catch (error) {
+                    console.log(error);
+                }
+                }
+            
+
+            function renderBook(book) {
+                let table = `
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>ISBN</th>
+                                        <th>Subject</th>
+                                        <th>Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+
+                    
+                    table += `
+                <tr data-id="${book.id}">
+                    <td><input class="form-check-input" type="checkbox" value="${book.id}" id="flexCheckDefault"></td> 
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>${book.subject}</td>
+                    <td>${book.category}</td>
+                </tr>
+            `;
+
+                table += '</div>';
+
+                const container = document.getElementById('bookContainer');
+                container.innerHTML = table;
+            }
+
+            getBook(id).then(data => {
+                renderBook(data);
+            });
+            
+        </script>
 
 </body>
 </html>
