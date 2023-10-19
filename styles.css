@@ -1,9 +1,22 @@
+@font-face {
+    font-family: "Euclid";
+    src: url("https://fontsforyou.com/fonts/e/Euclid.ttf");
+}
+
+body {
+    font-family: "Euclid";
+}
+
 .login-container {
     align-items: center;
     margin-top: 10%;
     width: 40%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.noHover{
+    pointer-events: none;
 }
 
 .dashboard-container {
@@ -33,6 +46,7 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 .title {
     color: black
 }
@@ -74,6 +88,59 @@
     font-size: large;
 }
 
+
+.boek-toevoegen-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #a1e20b;
+    text-align: center;
+}
+
+.verwijder-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #e20b0b;
+    text-align: center;
+.btn-primary {
+    color: #000 !important;
+    background-color: #00E600 !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    color: #000 !important;
+    background-color: #6E757C !important;
+}
+
+.btn-greyscale {
+    color: #fff !important;
+    background-color: #737D94 !important;
+}
+
+.btn-greyscale:hover, .btn-greyscale:focus, .btn-greyscale:active, .btn-greyscale.active, .open>.dropdown-toggle.btn-greyscale {
+    color: #fff !important;
+    background-color: #6E757C !important;
+}
+
+.btn-icegrey{
+    color:#fff !important;
+    background-color: #AEB4C1 !important;
+}
+
+.btn-danger{
+    color: #fff !important;
+}
+
+.btn-black{
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
+.btn-black:hover, .btn-black:focus, .btn-black:active, .btn-black.active, .open>.dropdown-toggle.btn-black {
+    color: #fff !important;
+    background-color: #6E757C !important;
+}
 
 .search-margin{
     margin-right: 20px;
