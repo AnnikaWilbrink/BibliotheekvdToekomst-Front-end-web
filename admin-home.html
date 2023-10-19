@@ -32,26 +32,28 @@
       });
     }
 
-    function buildReservationTable(data){
+    function buildTables(data){
       data.forEach(reservation => {
         defaultColors = ["primary", "danger"]
         if (reservation.deleted){
           return;
         }
-        if (reservation.approved){
-          approveButtonText = "Uitlenen";
-          declineButtonText = "Verwijderen";
-        }
         if (!reservation.approved){
           approveButtonText = "Goedkeuren";
           declineButtonText = "Afkeuren";
+          tableID = "unapproved"
         }
-        if (reservation.borrowed){
+        if (reservation.approved && !reservation.borrowed){
+          approveButtonText = "Uitlenen";
+          declineButtonText = "Verwijderen";
+          tableID = "approved"
+        }
+        if (reservation.approved && reservation.borrowed){
           approveButtonText = "Contact";
           declineButtonText = "Stel beschikbaar";
+          tableID = "borrowed"
           defaultColors = ["greyscale", "greyscale"]
         }
-
         html = "";
         html += `
         <tr>
@@ -67,15 +69,27 @@
             </button>
           </td>
         </tr>`;
-        const table = document.getElementById(reservation.approved.toString());
+        const table = document.getElementById(tableID);
         table.insertAdjacentHTML('beforeend', html);
         const approveButton = table.querySelector(`#approve_${reservation.id}`);
         const declineButton = table.querySelector(`#decline_${reservation.id}`);
         approveButton.addEventListener('click', () => {
           if (reservation.approved){
             createBorrowedBook();
-            deleteTables();
-            getReservations();
+            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+              method: "PUT",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              borrowed: true
+              })
+            })
+            .then(data => {
+              console.log('Reservation status updated');
+              deleteTables();
+              getReservations();
+            })
           }
           else{
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
@@ -137,7 +151,7 @@
       .then(response => response.json())
       .then(data => {
         console.log(data)
-        buildReservationTable(data)
+        buildTables(data)
       })
     return;
     }
@@ -198,7 +212,7 @@
     <div class="dashboard-container">
       <h1>Jouw dashboard</h1>
       <h4>Reserveringsverzoeken</h4>
-      <table class="table table-striped" id = "false">
+      <table class="table table-striped" id = "unapproved">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
@@ -214,7 +228,7 @@
       <br>
 
       <h4>Reserveringen</h4>
-      <table class="table table-striped" id = "true">
+      <table class="table table-striped" id = "approved">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
