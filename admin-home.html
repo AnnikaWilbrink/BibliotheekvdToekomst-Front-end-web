@@ -11,6 +11,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
   <script>
 
+
+
+    function createBorrowedBook(){
+      return;
+    }
+
     function deleteTables(){
       const tables = document.querySelectorAll('table');
       tables.forEach(table => {
@@ -26,27 +32,26 @@
       });
     }
 
-    function buildTables(data){
+    function buildReservationTable(data){
       data.forEach(reservation => {
         defaultColors = ["primary", "danger"]
-        switch(reservation.reservationStatus){
-          case "unapproved": 
-            approveButtonText = "Goedkeuren";
-            declineButtonText = "Afkeuren";
-            break;
-          case "approved":
-            approveButtonText = "Uitlenen";
-            declineButtonText = "Verwijderen";
-            break;
-          case "borrowed":
-            approveButtonText = "Contact";
-            declineButtonText = "Stel beschikbaar";
-            defaultColors = ["greyscale", "greyscale"]
-            break;
-          case "deleted":
-            return;
-            break;
+        if (reservation.deleted){
+          return;
         }
+        if (reservation.approved){
+          approveButtonText = "Uitlenen";
+          declineButtonText = "Verwijderen";
+        }
+        if (!reservation.approved){
+          approveButtonText = "Goedkeuren";
+          declineButtonText = "Afkeuren";
+        }
+        if (reservation.borrowed){
+          approveButtonText = "Contact";
+          declineButtonText = "Stel beschikbaar";
+          defaultColors = ["greyscale", "greyscale"]
+        }
+
         html = "";
         html += `
         <tr>
@@ -62,53 +67,49 @@
             </button>
           </td>
         </tr>`;
-        const table = document.getElementById(reservation.reservationStatus);
+        const table = document.getElementById(reservation.approved.toString());
         table.insertAdjacentHTML('beforeend', html);
         const approveButton = table.querySelector(`#approve_${reservation.id}`);
         const declineButton = table.querySelector(`#decline_${reservation.id}`);
         approveButton.addEventListener('click', () => {
-          if (reservation.reservationStatus == "unapproved"){
-            newStatus = "approved";
-          }
-          else {
-            newStatus = "borrowed";
-          }
-          fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-            method: "PUT",
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              reservationStatus: newStatus
-            })
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Reservation status updated');
+          if (reservation.approved){
+            createBorrowedBook();
             deleteTables();
             getReservations();
-          })
-          .catch(error => {
-            console.error('Error updating reservation status:', error);
-          });
-        })
+          }
+          else{
+            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+              method: "PUT",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              approved: true
+              })
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('Reservation status updated');
+              deleteTables();
+              getReservations();
+            })
+            .catch(error => {
+              console.error('Error updating reservation status:', error);
+            });
+          };
+        });        
         declineButton.addEventListener('click', () => {
-          switch(reservation.reservationStatus){
-          case "unapproved": 
-            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
-            break;
-          case "approved":
+          if (reservation.approved){
             confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
-            break;
-          case "borrowed":
-            confirmation = confirm("Weet je zeker dat je dit boek weer beschikbaar wilt stellen?")
-            break;
-        }
+          }
+          if(!reservation.approved){
+            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
+          }
           if (confirmation){
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
             method: "PUT",
@@ -116,7 +117,7 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              reservationStatus: "deleted"
+              deleted: true
             })
           })
             .then(response => {
@@ -135,9 +136,14 @@
       })
       .then(response => response.json())
       .then(data => {
-        buildTables(data)
+        console.log(data)
+        buildReservationTable(data)
       })
     return;
+    }
+
+    function getBorrowedBooks(){
+      return;
     }
     
   </script>
@@ -192,7 +198,7 @@
     <div class="dashboard-container">
       <h1>Jouw dashboard</h1>
       <h4>Reserveringsverzoeken</h4>
-      <table class="table table-striped" id = "unapproved">
+      <table class="table table-striped" id = "false">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
@@ -208,7 +214,7 @@
       <br>
 
       <h4>Reserveringen</h4>
-      <table class="table table-striped" id = "approved">
+      <table class="table table-striped" id = "true">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
