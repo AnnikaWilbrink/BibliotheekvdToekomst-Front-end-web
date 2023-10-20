@@ -135,10 +135,49 @@
 
       </div>
 
+    <div class="dashboard-container">
+      <h1>Jouw dashboard</h1>
+      <h4>Leningen [Geschiedenis]</h4>
+      <table class="table table-striped" id = "history">
+        <thead>
+          <tr>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Startdatum</em></th>
+            <th scope="col"><em>Einddatum</em></th>
+            <th scope="col"><em>Status</em></th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Stephen Kwan</td>
+                <td>Spring Framework</td>
+                <td>01-01-2023</td>
+                <td>01-01-2023</td>
+                <td><button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button></td>
+            </tr>
+            <tr>
+              <th scope="row">1</th>
+              <td>Stephen Kwan</td>
+              <td>Spring Framework</td>
+              <td>01-01-2023</td>
+              <td>01-01-2023</td>
+              <td><button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+
+      <h4>Mijn reviews</h4>
+    <button type="button" class="btn btn-black btn-outline-secondary border rounded-pill fw-bold" id="reviews">Zie mijn reviews</button> 
+
     </div>
 
-
     <script src="script.js" defer></script>
+
 
     <script>
       function clearLocalStorage() {
