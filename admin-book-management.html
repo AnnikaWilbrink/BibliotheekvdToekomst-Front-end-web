@@ -74,6 +74,24 @@
 
     <div class="container" id="booksContainer"></div>
 
+    <!-- The Modal -->
+    <div class="modal fade" id="updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                  <h4 class="modal-title">Update Boek Informatie</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div id="modal-body" class="modal-body"></div>
+
+              <div id="footer-button" class="modal-footer"></div>
+
+          </div>
+      </div>
+    </div>
+
     <script>
       // async function deleteSelectedBooks() {
       //   const checkboxes = document.querySelectorAll('.form-check-input:checked');
@@ -85,7 +103,7 @@
 
       //   for (let id of bookIdsToDelete) {
       //     try {
-      //       const response = await fetch(`http://localhost:8082/book/delete/${id}`, {
+      //       const response = await fetch(`http://localhost:8080/book/delete/${id}`, {
       //         method: 'GET',
       //       });
 
@@ -102,6 +120,114 @@
       //     renderBooks(data);
       //   });
       // }
+      function getBookInfo(bookId) {
+        return fetch(`http://localhost:8080/book/info/${bookId}`)
+            .then(response => {
+                return response.json();
+            });
+      }
+
+      function createModal(bookId) {
+      let modal = "";
+      getBookInfo(bookId)
+        .then(bookInfo => {
+          updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
+          modal += `
+        <form id="updateForm">
+          <input type="hidden" id="book_id" name="book_id" value="">
+          <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="author">Author:</label><br>
+            <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
+          </div> 
+          <div class="form-group">
+            <label for="isbn">ISBN:</label><br>
+            <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject:</label><br>
+            <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="edition">Edition:</label><br>
+            <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="category">Category:</label><br>
+            <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
+          </div>`;
+          
+      if (bookInfo.availablity == "available") {
+        modal += `
+        <div class="form-group">
+            <label for="availability">Availability:</label><br>
+            <select id="availability" name="availability" required>
+                <option value="available" selected>Available</option>
+                <option value="unavailable">Unavailable</option>
+            </select><br><br>
+        </div>`
+      } else {
+        modal += `
+        <div class="form-group">
+            <label for="availability">Availability:</label><br>
+            <select id="availability" name="availability" required>
+                <option value="available">Available</option>
+                <option value="unavailable" selected>Unavailable</option>
+            </select><br><br>
+        </div>`
+      }
+
+      modal += 
+      `<div class="form-group">
+            <label for="summary">Summary:</label>
+            <textarea id="summary" name="summary" class="form-control" rows="7" required>${bookInfo.summary}</textarea><br>
+          </div>
+          <div class="form-group">
+            <label for="coverUrl">Cover URL:</label><br>
+            <input type="url" id="coverUrl" name="coverUrl" oninput="displayImage()" value="${bookInfo.coverUrl}" class="form-control" required><br>
+          </div>
+      </form>
+      `;
+      document.getElementById("modal-body").innerHTML = modal;
+      document.getElementById("footer-button").innerHTML = updateButton;
+        })    
+    }
+
+    function updateBook(bookId) {
+      let obj = {
+        "title": document.getElementById("title").value,
+        "author": document.getElementById("author").value,
+        "isbn": document.getElementById("isbn").value,
+        "subject": document.getElementById("subject").value,
+        "edition": document.getElementById("edition").value,
+        "category": document.getElementById("category").value,
+        "availablity": document.getElementById("availability").value,
+        "summary": document.getElementById("summary").value,
+        "coverUrl": document.getElementById("coverUrl").value,
+      }
+      console.log(obj)
+      fetch(`http://localhost:8080/book/${bookId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(obj),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success) {
+              alert("Boek aangepast");
+              location.reload();
+            } else {
+              alert("Er is iets mis gegaan");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+    }
 
       function renderBooks(books) {
         let table = `
@@ -128,7 +254,7 @@
                   <td>${book.subject}</td>
                   <td>${book.category}</td>
                   <td>
-                    <button type="button" class="btn btn-greyscale btn-outline-secondary border rounded-pill fw-bold" id="aanpassen_${book.id}">
+                    <button type="button" class="btn btn-greyscale btn-outline-secondary border rounded-pill fw-bold" id="aanpassen_${book.id}" data-bs-toggle="modal" data-bs-target="#updateModal" onclick="createModal(${book.id})">
                       Aanpassen
                     </button>
                     <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${book.id}" onclick="archiveBook(${book.id})">
@@ -155,7 +281,7 @@
       async function getBooks() {
         try {
         const response = await fetch(
-          'http://localhost:8082/book/all',
+          'http://localhost:8080/book/all',
           {
             method: 'GET',
           },
@@ -198,7 +324,7 @@
       //     return; // if the input is empty, exit the function after fetching all books
       //   }
       //   try {
-      //     const response = await fetch('http://localhost:8082/book/search', {
+      //     const response = await fetch('http://localhost:8080/book/search', {
       //       method: 'POST',
       //       headers: {
       //         'Content-Type': 'application/json'
