@@ -11,11 +11,39 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
   <script>
 
-
-
-    function createBorrowedBook(){
-      return;
-    }
+ 
+    function createBorrowedBook(reservation){
+      console.log(reservation.bookId)
+      fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        /*
+        if(data.numberOfAvailableCopies == 0){
+          alert("Er zijn momenteel geen exemplaren beschikbaar!")
+          return false;
+        }
+        */
+        /*
+        else{
+      fetch(`http://localhost:8080/borrowed-book/save`, {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              userId: reservation.userId,
+              bookCopyId: 
+              })
+      })
+      alert("Boek succesvol uitgeleend!")
+      return true;
+        }
+        */
+        })
+      }
 
     function deleteTables(){
       const tables = document.querySelectorAll('table');
@@ -30,12 +58,13 @@
         table.remove();
       }
       });
+      return;
     }
 
     function buildTables(data){
       data.forEach(reservation => {
         defaultColors = ["primary", "danger"]
-        if (reservation.deleted){
+        if (reservation.deleted || reservation.borrowed){
           return;
         }
         if (!reservation.approved){
@@ -48,12 +77,14 @@
           declineButtonText = "Verwijderen";
           tableID = "approved"
         }
+        /*
         if (reservation.approved && reservation.borrowed){
           approveButtonText = "Contact";
           declineButtonText = "Stel beschikbaar";
           tableID = "borrowed"
           defaultColors = ["greyscale", "greyscale"]
         }
+        */
         html = "";
         html += `
         <tr>
@@ -75,7 +106,11 @@
         const declineButton = table.querySelector(`#decline_${reservation.id}`);
         approveButton.addEventListener('click', () => {
           if (reservation.approved){
-            createBorrowedBook();
+            let createLending = createBorrowedBook(reservation);
+            if (createLending == false){
+              return;
+            }
+            if (createLending == true){
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
               method: "PUT",
               headers: {
@@ -90,6 +125,7 @@
               deleteTables();
               getReservations();
             })
+          }
           }
           else{
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
@@ -144,19 +180,48 @@
       return;
     }
 
+    function buildBorrowedBooksTable(data){
+      html = "";
+        html += `
+        <tr>
+          <td>${reservation.id}</td>
+          <td>${reservation.userFirstName} ${reservation.userLastName}</td>
+          <td>${reservation.bookTitle}</td>
+          <td>
+            <button type="button" class="btn btn-${defaultColors[0]} btn-outline-secondary border rounded-pill fw-bold" id="approve_${reservation.id}">
+              ${approveButtonText}
+            </button>
+            <button type="button" class="btn btn-${defaultColors[1]} btn-outline-secondary border rounded-pill fw-bold" id="decline_${reservation.id}">
+              ${declineButtonText}
+            </button>
+          </td>
+        </tr>`;
+        const table = document.getElementById(tableID);
+        table.insertAdjacentHTML('beforeend', html);
+        const approveButton = table.querySelector(`#approve_${reservation.id}`);
+        const declineButton = table.querySelector(`#decline_${reservation.id}`);
+      return;
+    }
+
     function getReservations(){
       fetch(`http://localhost:8080/reservation/all`, {
         method: "GET",
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         buildTables(data)
       })
     return;
     }
 
     function getBorrowedBooks(){
+      fetch(`http://localhost:8080/borrowed-book/all`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        buildBorrowedBooksTable(data)
+      })
       return;
     }
     
