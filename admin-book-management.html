@@ -136,11 +136,11 @@
         <form id="updateForm">
           <input type="hidden" id="book_id" name="book_id" value="">
           <div class="form-group">
-            <label for="title">Title:</label>
+            <label for="title">Titel:</label>
             <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
           </div>
           <div class="form-group">
-            <label for="author">Author:</label><br>
+            <label for="author">Auteur:</label><br>
             <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
           </div> 
           <div class="form-group">
@@ -148,41 +148,41 @@
             <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
           </div>
           <div class="form-group">
-            <label for="subject">Subject:</label><br>
+            <label for="subject">Onderwerp:</label><br>
             <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
           </div>
           <div class="form-group">
-            <label for="edition">Edition:</label><br>
+            <label for="edition">Editie:</label><br>
             <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
           </div>
           <div class="form-group">
-            <label for="category">Category:</label><br>
+            <label for="category">Categorie:</label><br>
             <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
           </div>`;
           
-      if (bookInfo.availablity == "available") {
+      if (bookInfo.availablity == "beschikbaar") {
         modal += `
         <div class="form-group">
-            <label for="availability">Availability:</label><br>
+            <label for="availability">Beschikbaarheid:</label><br>
             <select id="availability" name="availability" required>
-                <option value="available" selected>Available</option>
-                <option value="unavailable">Unavailable</option>
+                <option value="available" selected>Beschikbaar</option>
+                <option value="unavailable">Niet beschikbaar</option>
             </select><br><br>
         </div>`
       } else {
         modal += `
         <div class="form-group">
-            <label for="availability">Availability:</label><br>
+            <label for="availability">Beschikbaarheid:</label><br>
             <select id="availability" name="availability" required>
-                <option value="available">Available</option>
-                <option value="unavailable" selected>Unavailable</option>
+                <option value="available">Beschikbaar</option>
+                <option value="unavailable" selected>Niet beschikbaar</option>
             </select><br><br>
         </div>`
       }
 
       modal += 
       `<div class="form-group">
-            <label for="summary">Summary:</label>
+            <label for="summary">Samenvatting:</label>
             <textarea id="summary" name="summary" class="form-control" rows="7" required>${bookInfo.summary}</textarea><br>
           </div>
           <div class="form-group">
