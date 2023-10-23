@@ -57,6 +57,50 @@ body {
     align-items: center;
     background: #00E600;
     text-align: center;
+    margin: 10px;
+    text-decoration: none;
+}
+
+.wt-btn:hover {
+    background-color: #01a801 !important;
+}
+
+.fav-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #131313;
+    text-align: center;
+    color: #00E600;
+}
+
+.fav-btn:hover{
+    color: #01a801 !important;
+}
+
+.bi-heart, 
+.bi-heart-fill{
+    color: #00E600;
+    font-size: large;
+}
+
+.bi-star{
+    font-size: large;
+}
+
+.bi-star-fill{
+    color: #e6e200;
+    font-size: large;
+}
+
+.wt-row{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.bk-pg-im{
+    max-width: 300px;
+    max-height: 350px;
 }
 
 .boek-toevoegen-btn{
@@ -73,6 +117,8 @@ body {
     align-items: center;
     background: #e20b0b;
     text-align: center;
+}
+    
 .btn-primary {
     color: #000 !important;
     background-color: #00E600 !important;
@@ -113,21 +159,49 @@ body {
 }
 
 .search-margin{
-    margin-right: 10px;
+    margin-right: 20px;
 }
 
 .container {
     padding: 20px;
 }
 
+.continents-wrap {
+    float:left;
+    width:20%;
+    margin:0 5% 0 0;
+    padding:10px;
+}	
+
+.container-side{
+    max-width: 300px;
+    min-width: 150px;
+    background-color: #fff;
+    padding:10px;
+    margin-right: 20px;
+}
+
+.container-left{
+    margin-right: 20px;
+}
+
+.row-side{
+    padding: 10px;
+    margin-right: 20px;
+}
+.row-side p{
+    margin-top: 10px;
+}
+
 .card {
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 20px;
     width: 300px;
     min-height: 600px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #fff;
+    margin-top: 15px;
 }
 
 .card h2 {
