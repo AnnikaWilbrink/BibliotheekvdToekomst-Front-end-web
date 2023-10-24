@@ -73,6 +73,13 @@
     </div>
 
     <div class="container" id="booksContainer"></div>
+    <br><br>
+    <div class="container">
+      <h3>Gearchiveerde boeken</h3>
+      <div id="archivedContainer">
+
+      </div>
+    </div>
 
     <!-- The Modal -->
     <div class="modal fade" id="updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
@@ -244,9 +251,13 @@
               </thead>
               <tbody>
           `;
+        let tableUnarchived = "";
+        let tableArchived = "";
 
         books.forEach(book => {
-          table += `
+          console.log(book.archived)
+          if (book.archived == false) {
+            tableUnarchived += `
               <tr data-id="${book.id}">
                   <td>${book.title}</td>
                   <td>${book.author}</td>
@@ -266,15 +277,39 @@
                   </td>
               </tr>
           `;
+          } else {
+            tableArchived += `
+              <tr data-id="${book.id}">
+                  <td>${book.title}</td>
+                  <td>${book.author}</td>
+                  <td>${book.isbn}</td>
+                  <td>${book.subject}</td>
+                  <td>${book.category}</td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="dearchiveren_${book.id}" onclick="unarchiveBook(${book.id})">
+                      Dearchiveren
+                    </button>
+                  </td>
+              </tr>
+          `;
+          }
+          
         });
 
-        table += `
+        tableUnarchived += `
+          </tbody>
+          </table>
+        `;
+
+        tableArchived += `
           </tbody>
           </table>
         `;
 
         const container = document.getElementById('booksContainer');
-        container.innerHTML = table;
+        container.innerHTML = table + tableUnarchived;
+        const archivedContainer = document.getElementById('archivedContainer');
+        archivedContainer.innerHTML = table + tableArchived;
       }
 
       // fetch all books from the database
@@ -303,8 +338,48 @@
         renderBooks(data);
       });
 
-      function archiveBook(id) {
-        alert("Je archiveert boek "+ id);
+      async function archiveBook(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/archive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek gearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      async function unarchiveBook(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/unarchive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek gedearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }        
       }
 
       function manageCopiesFor(id){
