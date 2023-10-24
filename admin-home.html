@@ -12,79 +12,133 @@
   
   <script>
 
+    async function updateReservationStatus(reservation){
+      return new Promise(async (resolve, reject) => {
+          try{
+            await createBorrowedBook(reservation)
+            const response = await fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+                  method: "PUT",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  borrowed: true
+                  })
+                })
+              if (response.ok) {
+                const data = await response.json();
+                console.log("Status reservation updated to borrowed:", data);
+                resolve(data)
+              }
+              else{
+              console.error("Error updating reservation status to borrowed:", data.statusText);
+              reject(data)
+            }
+            } catch (error) {
+            console.error("An error occurred:", error);
+            reject(error); // Reject the promise with an error
+          }
+            
+    })
+  }
+
     function borrowConfirmModal(){
-      const selectBookCopy = document.getElementById("selectBookCopy");
-      const selectedIndex = selectBookCopy.selectedIndex;
-      // const bookCopyNr = selectBookCopy.options[selectedIndex].text;
-      const selectedOption = selectBookCopy.options[selectedIndex]
-      const bookCopyId = selectedOption.getAttribute("data-invisible-info");
-      jQuery('#exampleModal').modal('hide');
-      document.getElementById("createBorrowConfirmModal").removeEventListener("click", borrowConfirmModal);
-      selectBookCopy.innerHTML = ""
-      console.log(bookCopyId)
-      return;
-    }
- 
-    function createBorrowedBook(reservation){
+      return new Promise(async (resolve, reject) => {
+        try{
+          const selectBookCopy = document.getElementById("selectBookCopy");
+          const selectedIndex = selectBookCopy.selectedIndex;
+          // const bookCopyNr = selectBookCopy.options[selectedIndex].text;
+          const selectedOption = selectBookCopy.options[selectedIndex]
+          console.log(selectedOption.getAttribute("data-invisible-info"))
+          const Ids = JSON.parse("[" + selectedOption.getAttribute("data-invisible-info") + "]");
+          jQuery('#exampleModal').modal('hide');
+          
+          selectBookCopy.innerHTML = ""
+          const response = await fetch(`http://localhost:8080/borrowed-book/save`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: Ids[1],
+                  bookCopyId: Ids[0]
+                  })
+                })
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Borrowed book created:", data);
+            const bookCopyResponse = await fetch(`http://localhost:8080/bookcopy/${Ids[0]}`, {
+              method: "PUT",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              available: false
+              })
+            })
+            if (bookCopyResponse.ok){
+                const bookCopyData = await bookCopyResponse.json();
+                console.log("Availability of bookcopy changed:", bookCopyData);
+                resolve(data); // Resolve the promise with the response data
+              }
+            else{
+              console.error("Error updating availability of bookcopy:", bookCopyResponse.statusText);
+              reject(data)
+            }
+            } else {
+            console.error("Error creating borrowed book:", response.statusText);
+            reject(response.statusText); // Reject the promise with an error
+            }
+        } catch (error) {
+          console.error("An error occurred:", error);
+          reject(error); // Reject the promise with an error
+        }
+        })
+      }
       
-      fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
+           
+    function createBorrowedBook(reservation){
+      return new Promise((resolve, reject) => {
+        fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
         method: "GET",
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         if(data.available.length == 0){
           alert("Er zijn momenteel geen exemplaren beschikbaar!")
-          return false;
+          reject("No available book copies");
         }
         else{
         html = ''
         for (let i = 0; i < data.available.length; i++) {
-          html += `<option value=${[i+1]} data-invisible-info=${[data.availableIds[i], reservation.userId]}>${data.available[i]}</option>`
+          html += `<option value=${[i+1]} data-invisible-info=${[data.availableIds[i],reservation.userId]}>${data.available[i]}</option>`
         }
         const selectBookCopy = document.getElementById("selectBookCopy");
         selectBookCopy.insertAdjacentHTML('beforeend', html);
         jQuery('#exampleModal').modal('show');
         document.getElementById("createBorrowCloseModal").addEventListener("click", function() {
           selectBookCopy.innerHTML = ""
-          return;
         });
-        document.getElementById("createBorrowConfirmModal").addEventListener("click", borrowConfirmModal)
+        document.getElementById("createBorrowConfirmModal").addEventListener("click", async function clickHandler() {
+          try {
+            createBorrowConfirmModal.removeEventListener("click", clickHandler)
+            const responseData = await borrowConfirmModal();
+            console.log("Response from borrowConfirmModal:", responseData);
+            resolve(responseData)
+          } catch (error) {
+            console.log("Error in borrowConfirmModal:", error);
+            reject(error);
+          }
+        })
         
-        
-        
-          /*
-          fetch(`http://localhost:8080/borrowed-book/save`, {
-              method: "POST",
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-              userId: reservation.userId,
-              bookCopyId: 
-              
-              })
-         })
-        */
-        
-        
-        //console.log(borrow)
-        return;
       }
     })
+    .catch(error => {
+      console.log("Error fetching book availability:", error);
+      reject(error);
+    });
+      })
   }
-          /*
-          
-      alert("Boek succesvol uitgeleend!")
-      return true;
-        }
-        })
-      */
-
-
-
-
-    
 
     function deleteTables(){
       const tables = document.querySelectorAll('table');
@@ -104,7 +158,7 @@
 
     function buildTables(data){
       data.forEach(reservation => {
-        console.log(reservation)
+        // console.log(reservation)
         defaultColors = ["primary", "danger"]
         if (reservation.deleted || reservation.borrowed){
           return;
@@ -146,29 +200,15 @@
         table.insertAdjacentHTML('beforeend', html);
         const approveButton = table.querySelector(`#approve_${reservation.id}`);
         const declineButton = table.querySelector(`#decline_${reservation.id}`);
-        approveButton.addEventListener('click', () => {
+        approveButton.addEventListener('click', async function () {
           if (reservation.approved){
-            let createLending = createBorrowedBook(reservation);
-            if (createLending == false){
-              return;
-            }
-            if (createLending == true){
-            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-              method: "PUT",
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-              borrowed: true
-              })
-            })
-            .then(data => {
-              console.log('Reservation status updated');
-              deleteTables();
-              getReservations();
-            })
+            try{
+              const responseData = await updateReservationStatus(reservation)
+              console.log("Response from updateReservationStatus:", responseData);
+            } catch (error) {
+              console.log("(Downstream) error in updateReservationStatus:", error);
           }
-          }
+        }
           else{
             fetch(`http://localhost:8080/reservation/${reservation.id}`, {
               method: "PUT",
@@ -194,6 +234,8 @@
               console.error('Error updating reservation status:', error);
             });
           };
+          deleteTables();
+          getReservations();
         });        
         declineButton.addEventListener('click', () => {
           if (reservation.approved){
