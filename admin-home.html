@@ -12,27 +12,21 @@
   
   <script>
 
-    function borrowConfirmModal(reservation){
+    function borrowConfirmModal(){
       const selectBookCopy = document.getElementById("selectBookCopy");
       const selectedIndex = selectBookCopy.selectedIndex;
-      const selectedOption = selectBookCopy.options[selectedIndex].text;
+      // const bookCopyNr = selectBookCopy.options[selectedIndex].text;
+      const selectedOption = selectBookCopy.options[selectedIndex]
+      const bookCopyId = selectedOption.getAttribute("data-invisible-info");
       jQuery('#exampleModal').modal('hide');
-      selectBookCopy.innerHTML = "";
       document.getElementById("createBorrowConfirmModal").removeEventListener("click", borrowConfirmModal);
-      fetch(`http://localhost:8080/borrowed-book/save`, {
-              method: "POST",
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-              userId: reservation.userId,
-              bookCopyId: 
-              })
-      })
+      selectBookCopy.innerHTML = ""
+      console.log(bookCopyId)
+      return;
     }
  
     function createBorrowedBook(reservation){
-      // console.log(reservation.bookId)
+      
       fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
         method: "GET",
       })
@@ -46,7 +40,7 @@
         else{
         html = ''
         for (let i = 0; i < data.available.length; i++) {
-          html += `<option value=${[i+1]}>${data.available[i]}</option>`
+          html += `<option value=${[i+1]} data-invisible-info=${[data.availableIds[i], reservation.userId]}>${data.available[i]}</option>`
         }
         const selectBookCopy = document.getElementById("selectBookCopy");
         selectBookCopy.insertAdjacentHTML('beforeend', html);
@@ -55,7 +49,24 @@
           selectBookCopy.innerHTML = ""
           return;
         });
-        document.getElementById("createBorrowConfirmModal").addEventListener("click", borrowConfirmModal(reservation));
+        document.getElementById("createBorrowConfirmModal").addEventListener("click", borrowConfirmModal)
+        
+        
+        
+          /*
+          fetch(`http://localhost:8080/borrowed-book/save`, {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              userId: reservation.userId,
+              bookCopyId: 
+              
+              })
+         })
+        */
+        
         
         //console.log(borrow)
         return;
@@ -93,6 +104,7 @@
 
     function buildTables(data){
       data.forEach(reservation => {
+        console.log(reservation)
         defaultColors = ["primary", "danger"]
         if (reservation.deleted || reservation.borrowed){
           return;
