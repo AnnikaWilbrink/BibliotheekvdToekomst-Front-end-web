@@ -5,235 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>De Bibliotheek Van De Toekomst</title>
-
-    <script>
-      function redirectToPage() {
-        window.location.href = "user-account.html";
-      }
-
-      async function deleteSelectedBooks() {
-        const checkboxes = document.querySelectorAll('.form-check-input:checked');
-        let bookIdsToDelete = [];
-
-        checkboxes.forEach((checkbox) => {
-            bookIdsToDelete.push(parseInt(checkbox.value));
-        });
-
-        for (let id of bookIdsToDelete) {
-            try {
-                const response = await fetch(`http://localhost:8080/book/delete/${id}`, {
-                    method: 'GET',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error deleting book with ID ${id}. Status: ${response.status}`);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-
-        // After deleting, re-fetch the book list to update the table
-        getBooks().then(data => {
-            renderBooks(data);
-        });
-      }
-
-
-      function renderBooks(books) {
-        let table = `
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>ISBN</th>
-                                <th>Subject</th>
-                                <th>Category</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-      books.forEach(book => {
-           
-        table += `
-    <tr data-id="${book.id}">
-        <td><input class="form-check-input" type="checkbox" value="${book.id}" id="flexCheckDefault"></td> 
-        <td>${book.title}</td>
-        <td>${book.author}</td>
-        <td>${book.isbn}</td>
-        <td>${book.subject}</td>
-        <td>${book.category}</td>
-        <td><button onclick="createModal(${book.id})" type="button" class="wt-btn btn-outline-secondary border rounded-pill text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#updateModal">Updaten</button></td>
-    </tr>
-`;
-
-                });
-
-    table += '</div>';
-
-    const container = document.getElementById('booksContainer');
-    container.innerHTML = table;
-    
-}
-
-    function getBookInfo(bookId) {
-      return fetch(`http://localhost:8080/book/info/${bookId}`)
-          .then(response => {
-              return response.json();
-          });
-    }
-
-    function createModal(bookId) {
-      let modal = "";
-      getBookInfo(bookId)
-        .then(bookInfo => {
-          modal += `
-        <form id="updateForm">
-          <input type="hidden" id="book_id" name="book_id" value="">
-          <div class="form-group">
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="author">Author:</label><br>
-            <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
-          </div> 
-          <div class="form-group">
-            <label for="isbn">ISBN:</label><br>
-            <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="subject">Subject:</label><br>
-            <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="edition">Edition:</label><br>
-            <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="category">Category:</label><br>
-            <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
-          </div>`;
-          
-      if (bookInfo.availablity == "available") {
-        modal += `
-        <div class="form-group">
-            <label for="availability">Availability:</label><br>
-            <select id="availability" name="availability" required>
-                <option value="available" selected>Available</option>
-                <option value="unavailable">Unavailable</option>
-            </select><br><br>
-        </div>`
-      } else {
-        modal += `
-        <div class="form-group">
-            <label for="availability">Availability:</label><br>
-            <select id="availability" name="availability" required>
-                <option value="available">Available</option>
-                <option value="unavailable" selected>Unavailable</option>
-            </select><br><br>
-        </div>`
-      }
-
-      modal += 
-      `<div class="form-group">
-            <label for="summary">Summary:</label>
-            <textarea id="summary" name="summary" class="form-control" rows="7" required>${bookInfo.summary}</textarea><br>
-          </div>
-          <div class="form-group">
-            <label for="coverUrl">Cover URL:</label><br>
-            <input type="url" id="coverUrl" name="coverUrl" oninput="displayImage()" value="${bookInfo.coverUrl}" class="form-control" required><br>
-          </div>
-      </form>
-      `;
-      document.getElementById("modal-body").innerHTML = modal;
-        })
-        
-    }
-
-
-
-      // fetch all book from the database
-      async function getBooks() {
-        try {
-        const response = await fetch(
-          'http://localhost:8080/book/all',
-          {
-            method: 'GET',
-          },
-        );
-        
-        //if it doesn't work throw error
-        if (!response.ok) {
-          throw new Error(`Error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        return data;
-      } catch (error) {
-        console.log(error);
-      }
-      }
-      
-      // for all the books that are fetched --> place them in a card in a grid
-      getBooks().then(data => {
-        renderBooks(data);
-      });
-
-
-      //search books funciton
-      async function search_book() {
-  let input = document.getElementById('search-input').value;
-  
-  if (!input) {
-    getBooks().then(data => {
-      renderBooks(data);
-  });
-  return; // if the input is empty, exit the function after fetching all books
-}
-  try {
-    const response = await fetch('http://localhost:8080/book/search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ searchWord: input })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error! status: ${response.status}`);
-    }
-
-
-    const data = await response.json();
-    renderBooks(data);
-
-
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Bind the Enter key to the search function
-document.getElementById('search-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-      search_book();
-    }
-});
-
-    </script>
     
     <!-- dit is de bootstrap link-->
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css'>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   </head>
-  <body>
 
+  <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -243,7 +21,7 @@ document.getElementById('search-input').addEventListener('keypress', function (e
           />
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -254,7 +32,7 @@ document.getElementById('search-input').addEventListener('keypress', function (e
               <a class="nav-link" href="boeken-overzicht.html">Boeken overzicht</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="admin-statistieken.html">Statistieken</a>
+              <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="admin-book-management.html">Boek management</a>
@@ -271,16 +49,9 @@ document.getElementById('search-input').addEventListener('keypress', function (e
       </div>
     </nav>
 
-    <script>
-      function clearLocalStorage() {
-        localStorage.clear();
-      }
-    </script>
-
     <div class="container">
       <div class="row">
-        <div class="col-md-5 mx-auto">
-
+        <!-- <div class="col-md-5 mx-auto">
           <form id="searchForm" onsubmit="event.preventDefault(); search_book();">
             <div class="input-group">
               <input class="form-control border rounded-pill search-margin" type="search" placeholder="Zoek op titel, auteur of ISBN" id="search-input">
@@ -289,19 +60,26 @@ document.getElementById('search-input').addEventListener('keypress', function (e
               </span>
             </div>
           </form>
-        </div>
-        <div class="col-3 text-end">
+        </div> -->
+        <!-- <div class="col-3 text-end">
           <button class="verwijder-btn  border rounded-pill fw-bold" type="button" onclick="deleteSelectedBooks();">Verwijderen</button>
-      </div>
+        </div> -->
         <div class="col-3 text-start">
           <button class="boek-toevoegen-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="window.location.href='admin-append-book.html';">
-              Toevoegen
+              Boek toevoegen
           </button>
-      </div>
+        </div>
       </div>
     </div>
 
-    <div id="booksContainer"></div>
+    <div class="container" id="booksContainer"></div>
+    <br><br>
+    <div class="container">
+      <h3>Gearchiveerde boeken</h3>
+      <div id="archivedContainer">
+
+      </div>
+    </div>
 
     <!-- The Modal -->
     <div class="modal fade" id="updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
@@ -310,28 +88,350 @@ document.getElementById('search-input').addEventListener('keypress', function (e
 
               <div class="modal-header">
                   <h4 class="modal-title">Update Boek Informatie</h4>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetForm()"></button>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
-              <div id="modal-body" class="modal-body">
-                  
-              </div>
+              <div id="modal-body" class="modal-body"></div>
 
-              <div id="footer-button" class="modal-footer">
-                <button type="button" class="btn btn-primary">Update</button>
-              </div>
+              <div id="footer-button" class="modal-footer"></div>
 
           </div>
       </div>
-  </div>
+    </div>
 
+    <script>
+      // async function deleteSelectedBooks() {
+      //   const checkboxes = document.querySelectorAll('.form-check-input:checked');
+      //   let bookIdsToDelete = [];
 
-    <a href="example-book.html" target="_self">Go To Book Example</a>
-    <a href="user-dashboard.html" target="_self">Click Me For User Dashboard</a>
-    <a href="admin-dashboard.html" target="_self">Go Back To Admin Dashboard</a>
+      //   checkboxes.forEach((checkbox) => {
+      //       bookIdsToDelete.push(parseInt(checkbox.value));
+      //   });
+
+      //   for (let id of bookIdsToDelete) {
+      //     try {
+      //       const response = await fetch(`http://localhost:8080/book/delete/${id}`, {
+      //         method: 'GET',
+      //       });
+
+      //       if (!response.ok) {
+      //         throw new Error(`Error deleting book with ID ${id}. Status: ${response.status}`);
+      //       }
+      //     } catch (error) {
+      //       console.log(error);
+      //     }
+      //   }
+
+      //   // After deleting, re-fetch the book list to update the table
+      //   getBooks().then(data => {
+      //     renderBooks(data);
+      //   });
+      // }
+      function getBookInfo(bookId) {
+        return fetch(`http://localhost:8080/book/info/${bookId}`)
+            .then(response => {
+                return response.json();
+            });
+      }
+
+      function createModal(bookId) {
+      let modal = "";
+      getBookInfo(bookId)
+        .then(bookInfo => {
+          updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
+          modal += `
+        <form id="updateForm">
+          <input type="hidden" id="book_id" name="book_id" value="">
+          <div class="form-group">
+            <label for="title">Titel:</label>
+            <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="author">Auteur:</label><br>
+            <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
+          </div> 
+          <div class="form-group">
+            <label for="isbn">ISBN:</label><br>
+            <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="subject">Onderwerp:</label><br>
+            <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="edition">Editie:</label><br>
+            <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
+          </div>
+          <div class="form-group">
+            <label for="category">Categorie:</label><br>
+            <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
+          </div>`;
+          
+      if (bookInfo.availablity == "beschikbaar") {
+        modal += `
+        <div class="form-group">
+            <label for="availability">Beschikbaarheid:</label><br>
+            <select id="availability" name="availability" required>
+                <option value="available" selected>Beschikbaar</option>
+                <option value="unavailable">Niet beschikbaar</option>
+            </select><br><br>
+        </div>`
+      } else {
+        modal += `
+        <div class="form-group">
+            <label for="availability">Beschikbaarheid:</label><br>
+            <select id="availability" name="availability" required>
+                <option value="available">Beschikbaar</option>
+                <option value="unavailable" selected>Niet beschikbaar</option>
+            </select><br><br>
+        </div>`
+      }
+
+      modal += 
+      `<div class="form-group">
+            <label for="summary">Samenvatting:</label>
+            <textarea id="summary" name="summary" class="form-control" rows="7" required>${bookInfo.summary}</textarea><br>
+          </div>
+          <div class="form-group">
+            <label for="coverUrl">Cover URL:</label><br>
+            <input type="url" id="coverUrl" name="coverUrl" oninput="displayImage()" value="${bookInfo.coverUrl}" class="form-control" required><br>
+          </div>
+      </form>
+      `;
+      document.getElementById("modal-body").innerHTML = modal;
+      document.getElementById("footer-button").innerHTML = updateButton;
+        })    
+    }
+
+    function updateBook(bookId) {
+      let obj = {
+        "title": document.getElementById("title").value,
+        "author": document.getElementById("author").value,
+        "isbn": document.getElementById("isbn").value,
+        "subject": document.getElementById("subject").value,
+        "edition": document.getElementById("edition").value,
+        "category": document.getElementById("category").value,
+        "availablity": document.getElementById("availability").value,
+        "summary": document.getElementById("summary").value,
+        "coverUrl": document.getElementById("coverUrl").value,
+      }
+      console.log(obj)
+      fetch(`http://localhost:8080/book/${bookId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(obj),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success) {
+              alert("Boek aangepast");
+              location.reload();
+            } else {
+              alert("Er is iets mis gegaan");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+    }
+
+      function renderBooks(books) {
+        let table = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>ISBN</th>
+                  <th>Subject</th>
+                  <th>Category</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+        let tableUnarchived = "";
+        let tableArchived = "";
+
+        books.forEach(book => {
+          console.log(book.archived)
+          if (book.archived == false) {
+            tableUnarchived += `
+              <tr data-id="${book.id}">
+                  <td>${book.title}</td>
+                  <td>${book.author}</td>
+                  <td>${book.isbn}</td>
+                  <td>${book.subject}</td>
+                  <td>${book.category}</td>
+                  <td>
+                    <button type="button" class="btn btn-greyscale btn-outline-secondary border rounded-pill fw-bold" id="aanpassen_${book.id}" data-bs-toggle="modal" data-bs-target="#updateModal" onclick="createModal(${book.id})">
+                      Aanpassen
+                    </button>
+                    <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${book.id}" onclick="archiveBook(${book.id})">
+                      Archiveren
+                    </button>
+                    <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="exemplaren_${book.id}" onclick="manageCopiesFor(${book.id})">
+                      Exemplaren
+                    </button>
+                  </td>
+              </tr>
+          `;
+          } else {
+            tableArchived += `
+              <tr data-id="${book.id}">
+                  <td>${book.title}</td>
+                  <td>${book.author}</td>
+                  <td>${book.isbn}</td>
+                  <td>${book.subject}</td>
+                  <td>${book.category}</td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="dearchiveren_${book.id}" onclick="unarchiveBook(${book.id})">
+                      Dearchiveren
+                    </button>
+                  </td>
+              </tr>
+          `;
+          }
+          
+        });
+
+        tableUnarchived += `
+          </tbody>
+          </table>
+        `;
+
+        tableArchived += `
+          </tbody>
+          </table>
+        `;
+
+        const container = document.getElementById('booksContainer');
+        container.innerHTML = table + tableUnarchived;
+        const archivedContainer = document.getElementById('archivedContainer');
+        archivedContainer.innerHTML = table + tableArchived;
+      }
+
+      // fetch all books from the database
+      async function getBooks() {
+        try {
+        const response = await fetch(
+          'http://localhost:8080/book/all',
+          {
+            method: 'GET',
+          },
+        );
+        
+        //if it doesn't work throw error
+        if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+        }
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      
+      // for all the books that are fetched --> place them in table
+      getBooks().then(data => {
+        renderBooks(data);
+      });
+
+      async function archiveBook(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/archive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek gearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      async function unarchiveBook(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/unarchive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek gedearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }        
+      }
+
+      function manageCopiesFor(id){
+        localStorage.setItem("WT_book_manage", id);
+         // Redirect to the "admin-book-copy-management.html" page
+        window.location.href = "admin-book-copy-management.html";
+      }
+
+      // //search books function
+      // async function search_book() {
+      //   let input = document.getElementById('search-input').value;
+
+      //   if (!input) {
+      //     getBooks().then(data => {
+      //       renderBooks(data);
+      //     });
+      //     return; // if the input is empty, exit the function after fetching all books
+      //   }
+      //   try {
+      //     const response = await fetch('http://localhost:8080/book/search', {
+      //       method: 'POST',
+      //       headers: {
+      //         'Content-Type': 'application/json'
+      //       },
+      //       body: JSON.stringify({ searchWord: input })
+      //     });
+
+      //     if (!response.ok) {
+      //       throw new Error(`Error! status: ${response.status}`);
+      //     }
+
+      //     const data = await response.json();
+      //     renderBooks(data);
+
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
+
+      // // Bind the Enter key to the search function
+      // document.getElementById('search-input').addEventListener('keypress', function (e) {
+      //     if (e.key === 'Enter') {
+      //       search_book();
+      //     }
+      // });
+
+      function clearLocalStorage() {
+        localStorage.clear();
+      }
+    </script>
 
     <script src="script.js" defer></script>
-
     <!-- dit is de bootstrap link-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
