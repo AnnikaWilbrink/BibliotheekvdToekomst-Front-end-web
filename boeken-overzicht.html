@@ -31,7 +31,7 @@
               <a class="nav-link" href="user-home.html">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="user-boeken.html">Boeken</a>
+              <a class="nav-link active" aria-current="page" href="boeken-overzicht.html">Boeken overzicht</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="user-account.html">Account</a>
@@ -169,7 +169,7 @@
                         Bekijken
                       </a>
                       <button class="fav-btn border rounded-pill" id="fav${book.id}" onclick="saveOrDel(${book.id})">
-                        
+                        <i class="far fa-heart addFav"></i>
                       </button>
                     </div>
                 </div>
@@ -243,7 +243,7 @@
         try {
           // hier de filter functie
           // TODO
-          const response = await fetch('http://localhost:8080/book/filter', {
+          const response = await fetch('http://localhost:8080/book/search', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -256,6 +256,7 @@
           }
 
           const data = await response.json();
+          console.log(data)
           renderBooks(data);
 
         } catch (error) {
@@ -266,6 +267,98 @@
       function clearLocalStorage() {
         localStorage.clear();
       }
+
+      function findAllFavs(book) {
+                let userId = localStorage.getItem("WT_ID");
+                let favids = [];
+                console.log("start met ophalen")
+                fetch(`http://localhost:8080/favorite/all/${userId}`)
+                    .then(response => response.json())
+                    .then(data =>{
+                        data.forEach(favorite => {
+                            favids.push(favorite.bookId);
+                        });
+                        console.log("USER:", userId);
+                        console.log("FAVBOOKS:", data);
+                        let favButton = document.getElementById(`fav${book}`);
+                        if (favids.includes(parseInt(book))) {
+                            console.log("YES")
+                            favButton.innerHTML = '<span id="addFav">Verwijder van favorieten</span> <i class="fas fa-heart"></i>';
+                        } else {
+                            console.log("NO")
+                            favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
+                        }
+                            
+                        
+                    })
+                console.log("Na fetch")
+            }
+
+
+            function saveFavorite(bookId) {
+                let userId = localStorage.getItem("WT_ID");
+                
+                let obj = {
+                    "bookId": bookId,
+                    "userId": userId
+                }
+
+                fetch("http://localhost:8080/favorite/save", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => response.json())
+            }
+
+
+            function deleteFavorite(bookId) {
+                let userId = localStorage.getItem("WT_ID");
+                
+                let obj = {
+                    "bookId": bookId,
+                    "userId": userId
+                }
+                
+                fetch("http://localhost:8080/favorite/delete", {
+                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => {
+                    if (response.status === 200) {
+                        console.log("Favorite deleted successfully");
+                    } else {
+                        console.log("Failed to delete favorite");
+                    }
+                });
+            }
+
+            function saveOrDel(bookId){
+                let favButton = document.getElementById(`fav${bookId}`);
+                console.log(favButton)
+                let heartIcon = favButton.querySelector("i.fa-heart");
+                if (heartIcon.classList.contains("far")) { //Favorites book
+                    console.log("Favorite")
+                    favButton.innerHTML = '<span id="addFav">Verwijder van favorieten</span> <i class="fas fa-heart"></i>';
+                    // Save Book to favorites in db...
+                    saveFavorite(bookId)
+
+                } else { //Unfavorites book
+                    console.log("Unfavorite")
+                    heartIcon.classList.remove("fas");
+                    heartIcon.classList.add("far");
+                    favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
+                    // Remove Book from favorites in db...
+                    deleteFavorite(bookId);
+                }
+            }
 
     </script>
     <script src="favorite-book.js"></script>

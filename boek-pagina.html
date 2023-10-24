@@ -167,7 +167,8 @@
                     <div>
                         <div class= row">
                             <h3>Reviews</h3>
-                            <p>${reviews}</p>
+                            <p>${reviews.stars}</p>
+                            <p>${reviews.text}</p>
                         </div>
                     </div>
                 `;
@@ -211,7 +212,7 @@
                             console.log("NO")
                             favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
                         }
-                            
+                        
                         
                     })
                 console.log("Na fetch")
@@ -282,7 +283,7 @@
                     deleteFavorite(bookId);
                 }
             }
- 
+
         </script>
 
 </body>
