@@ -158,20 +158,23 @@
 
 
             function renderReviews(reviews){
-                
                 let table = `
                 <div class="container">
                         `;
+                
+                reviews.forEach(review => {
                     
                     table += `
                     <div>
                         <div class= row">
-                            <h3>Reviews</h3>
-                            <p>${reviews.stars}</p>
-                            <p>${reviews.text}</p>
+                            <h4>Review door ${review.userId}</h4>
+                            <ul>
+                            <li>Aantal sterren: ${review.stars}</li>
+                            <li>${review.text}</li>
+                            </ul>
                         </div>
                     </div>
-                `;
+                `;});
 
                 table += '</div>';
 
