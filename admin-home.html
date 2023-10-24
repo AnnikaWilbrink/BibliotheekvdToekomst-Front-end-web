@@ -9,25 +9,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
+  
   <script>
 
- 
-    function createBorrowedBook(reservation){
-      console.log(reservation.bookId)
-      fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
-        method: "GET",
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        /*
-        if(data.numberOfAvailableCopies == 0){
-          alert("Er zijn momenteel geen exemplaren beschikbaar!")
-          return false;
-        }
-        */
-        /*
-        else{
+    function borrowConfirmModal(reservation){
+      const selectBookCopy = document.getElementById("selectBookCopy");
+      const selectedIndex = selectBookCopy.selectedIndex;
+      const selectedOption = selectBookCopy.options[selectedIndex].text;
+      jQuery('#exampleModal').modal('hide');
+      selectBookCopy.innerHTML = "";
+      document.getElementById("createBorrowConfirmModal").removeEventListener("click", borrowConfirmModal);
       fetch(`http://localhost:8080/borrowed-book/save`, {
               method: "POST",
               headers: {
@@ -38,12 +29,51 @@
               bookCopyId: 
               })
       })
+    }
+ 
+    function createBorrowedBook(reservation){
+      // console.log(reservation.bookId)
+      fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if(data.available.length == 0){
+          alert("Er zijn momenteel geen exemplaren beschikbaar!")
+          return false;
+        }
+        else{
+        html = ''
+        for (let i = 0; i < data.available.length; i++) {
+          html += `<option value=${[i+1]}>${data.available[i]}</option>`
+        }
+        const selectBookCopy = document.getElementById("selectBookCopy");
+        selectBookCopy.insertAdjacentHTML('beforeend', html);
+        jQuery('#exampleModal').modal('show');
+        document.getElementById("createBorrowCloseModal").addEventListener("click", function() {
+          selectBookCopy.innerHTML = ""
+          return;
+        });
+        document.getElementById("createBorrowConfirmModal").addEventListener("click", borrowConfirmModal(reservation));
+        
+        //console.log(borrow)
+        return;
+      }
+    })
+  }
+          /*
+          
       alert("Boek succesvol uitgeleend!")
       return true;
         }
-        */
         })
-      }
+      */
+
+
+
+
+    
 
     function deleteTables(){
       const tables = document.querySelectorAll('table');
@@ -323,10 +353,41 @@
       </table>
 
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <select class="form-select" aria-label="Default select example" id = "selectBookCopy">
+              <!-- <option selected>Open this select menu</option> -->
+            </select>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="createBorrowCloseModal" style="float: right;">Close</button>
+            <button type="button" class="btn btn-primary" id="createBorrowConfirmModal" style="float: right;">Save changes</button>
+            <div class="clearfix"></div>
+          </div>
+          <div class="modal-footer">
+            ..
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
     
     <script src="script.js" defer></script>
 
     <!-- dit is de bootstrap link-->
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
   </body>
 </html>
