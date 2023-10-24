@@ -137,37 +137,23 @@
 
     <div class="dashboard-container">
       <h1>Jouw dashboard</h1>
-      <h4>Leningen [Geschiedenis]</h4>
-      <table class="table table-striped" id = "history">
-        <thead>
-          <tr>
-            <th scope="col"><em>#</em></th>
-            <th scope="col"><em>Naam</em></th>
-            <th scope="col"><em>Boek</em></th>
-            <th scope="col"><em>Startdatum</em></th>
-            <th scope="col"><em>Einddatum</em></th>
-            <th scope="col"><em>Status</em></th>
-          </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Stephen Kwan</td>
-                <td>Spring Framework</td>
-                <td>01-01-2023</td>
-                <td>01-01-2023</td>
-                <td><button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button></td>
-            </tr>
-            <tr>
-              <th scope="row">1</th>
-              <td>Stephen Kwan</td>
-              <td>Spring Framework</td>
-              <td>01-01-2023</td>
-              <td>01-01-2023</td>
-              <td><button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button></td>
-          </tr>
-        </tbody>
-      </table>
+      <h4>Geschiedenis</h4>
+
+      <div class="container mt-5">
+        <table class="table table-striped" id="history">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Boek</em></th>
+                    <th scope="col"><em>Startdatum</em></th>
+                    <th scope="col"><em>Einddatum</em></th>
+                    <th scope="col"><em>Status</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
 
       <br>
 
@@ -177,6 +163,69 @@
     </div>
 
     <script src="script.js" defer></script>
+
+
+    <script> 
+      // Fetch borrowed books
+      window.onload = function() {
+      fetchBorrowedBooks();
+      };
+
+      function formatDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(date).toLocaleDateString(undefined, options);
+      }
+
+      function fetchBorrowedBooks() {
+       
+        fetch("http://localhost:8080/user/borrowed-books-list", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: localStorage.getItem("WT_TOKEN"),
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            renderBorrowedBooks(data);
+        })
+        .catch(error => {
+            console.error('Error fetching borrowed books:', error);
+        });
+      }
+
+      function renderBorrowedBooks(books) {
+        const tableBody = document.querySelector('#history tbody');
+        tableBody.innerHTML = ""; // Clear current rows
+
+        // Sort the books: current books first, returned books later
+        books.sort((a, b) => {
+          if (a.returnedDate === null && b.returnedDate !== null) return -1;
+          if (a.returnedDate !== null && b.returnedDate === null) return 1;
+          return 0; // Both are either current or returned
+        });
+
+        books.forEach((book, index) => {
+          const row = tableBody.insertRow();
+
+          const cellBookTitle = row.insertCell(0);
+          cellBookTitle.textContent = book.bookTitle; 
+
+          const cellStartDate = row.insertCell(1);
+          cellStartDate.textContent = formatDate(book.borrowDate);
+
+          const cellEndDate = row.insertCell(2);
+          cellEndDate.textContent = book.returnedDate ? formatDate(book.returnedDate) : '-';
+
+          const cellStatus = row.insertCell(3);
+          if (book.returnedDate) {
+              cellStatus.innerHTML = '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button>';
+          } else {
+              cellStatus.innerHTML = '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button>';
+          }
+        });
+      }
+    </script>
 
 
     <script>
