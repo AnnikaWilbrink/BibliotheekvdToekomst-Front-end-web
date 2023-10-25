@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <!-- dit is de bootstrap link-->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<body onload=loadAll(id)>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+            <img
+            src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+            alt="WorkingTalent" width="150" 
+            />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                      <a class="nav-link" aria-current="page" href="admin-home.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link active" href="boeken-overzicht-admin.html">Boeken overzicht</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" aria-current="page" href="admin-book-management.html">Boek management</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="admin-account.html">Account</a>
+                    </li> 
+                    <li class="nav-item">
+                      <a class="nav-link" href="admin-favorites.html">Favorieten</a>
+                    </li>
+                    <ul class="navbar-nav">
+                      <li class="nav-item">
+                        <a class="nav-link" href="index.html">Log Uit</a>
+                      </li>
+                    </ul>
+            </ul>
+            </div>
+        </div>
+        </nav>
+
+        <div class="parent-container d-flex">
+            <!-- linker container-->
+            <div id="bookContainer">
+
+            </div>
+
+            <!-- rechter container-->
+            <div id="reviewContainer">
+
+            </div>
+        </div>
+
+
+        <script>
+            id = localStorage.getItem('WT_book');
+            console.log("id="+id)
+
+            async function getBook(id) {
+                try {
+                const response = await fetch(`http://localhost:8080/book/info/${id}`, {
+                method: 'GET',
+                });
+                
+                //if it doesn't work throw error
+                if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data)
+                return data;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+            async function getReviews(id) {
+                try {
+                const response = await fetch(`http://localhost:8080/review/book/${id}`, {
+                method: 'GET',
+                });
+                
+                //if it doesn't work throw error
+                if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data)
+                return data;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            
+
+            function renderBook(book) {
+                let table = `
+                <div class="parent-container d-flex">
+                        `;
+
+                    
+                    table += `
+                    <div class="container">
+                        <div class= row-md-6">
+                            <div class="col-auto">
+                                <h1>${book.title}</h1>
+                                <h3>${book.author}</h3>
+                            </div>
+
+                        </div>
+                        <div class= row-md-6">
+                            <div class="col-auto">
+                                <img src="${book.coverUrl}" >
+                            </div>
+                    </div>
+                    <div class="container">
+                        <div class="row-md-6">
+                            <div class="col-auto">
+                                <h4>Details</h4>
+
+                                <p>${book.summary}</p>
+
+                                <ul>
+                                    <li>ISBN nummer: ${book.isbn}
+                                    <li>Categorie: ${book.category}</li>
+                                    <li>Onderwerp: ${book.subject}</li>
+                                    <li>Editie: ${book.edition}</li>
+                                </ul>
+
+                                <button class="wt-btn  border rounded-pill text-dark fw-bold" type="button" onclick="">
+                                    Reserveringsverzoek
+                                </button>
+                                <button class="fav-btn border rounded-pill fw-bold" id="fav${book.id}" onclick="saveOrDel(${book.id})">
+                                    <span class="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+            `;
+
+                table += '</div>';
+
+                const container = document.getElementById('bookContainer');
+                container.innerHTML = table;
+            }
+
+
+            function renderReviews(reviews){
+                let table = `
+                <div class="container">
+                        `;
+                
+                reviews.forEach(review => {
+                    
+                    table += `
+                    <div>
+                        <div class= row">
+                            <h4>Review door ${review.userId}</h4>
+                            <ul>
+                            <li>Aantal sterren: ${review.stars}</li>
+                            <li>${review.text}</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;});
+
+                table += '</div>';
+
+                const container = document.getElementById('reviewContainer');
+                container.innerHTML = table;
+            }
+
+            function loadAll(id){
+
+                getBook(id).then(data => {
+                    renderBook(data);
+                });
+
+                findAllFavs(id);
+
+                getReviews(id).then(data => {
+                    renderReviews(data);
+                })
+            }
+
+            function findAllFavs(book) {
+                let userId = localStorage.getItem("WT_ID");
+                let favids = [];
+                console.log("start met ophalen")
+                fetch(`http://localhost:8080/favorite/all/${userId}`)
+                    .then(response => response.json())
+                    .then(data =>{
+                        data.forEach(favorite => {
+                            favids.push(favorite.bookId);
+                        });
+                        console.log("USER:", userId);
+                        console.log("FAVBOOKS:", data);
+                        let favButton = document.getElementById(`fav${book}`);
+                        if (favids.includes(parseInt(book))) {
+                            console.log("YES")
+                            favButton.innerHTML = '<span id="addFav">Verwijder van favorieten</span> <i class="fas fa-heart"></i>';
+                        } else {
+                            console.log("NO")
+                            favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
+                        }
+                        
+                        
+                    })
+                console.log("Na fetch")
+            }
+
+
+            function saveFavorite(bookId) {
+                let userId = localStorage.getItem("WT_ID");
+                
+                let obj = {
+                    "bookId": bookId,
+                    "userId": userId
+                }
+
+                fetch("http://localhost:8080/favorite/save", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => response.json())
+            }
+
+
+            function deleteFavorite(bookId) {
+                let userId = localStorage.getItem("WT_ID");
+                
+                let obj = {
+                    "bookId": bookId,
+                    "userId": userId
+                }
+                
+                fetch("http://localhost:8080/favorite/delete", {
+                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => {
+                    if (response.status === 200) {
+                        console.log("Favorite deleted successfully");
+                    } else {
+                        console.log("Failed to delete favorite");
+                    }
+                });
+            }
+
+            function saveOrDel(bookId){
+                let favButton = document.getElementById(`fav${bookId}`);
+                console.log(favButton)
+                let heartIcon = favButton.querySelector("i.fa-heart");
+                if (heartIcon.classList.contains("far")) { //Favorites book
+                    console.log("Favorite")
+                    favButton.innerHTML = '<span id="addFav">Verwijder van favorieten</span> <i class="fas fa-heart"></i>';
+                    // Save Book to favorites in db...
+                    saveFavorite(bookId)
+
+                } else { //Unfavorites book
+                    console.log("Unfavorite")
+                    heartIcon.classList.remove("fas");
+                    heartIcon.classList.add("far");
+                    favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
+                    // Remove Book from favorites in db...
+                    deleteFavorite(bookId);
+                }
+            }
+
+        </script>
+
+</body>
+</html>

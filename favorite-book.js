@@ -1,27 +1,27 @@
-function findAll() {
-    console.log("start met ophalen")
-    fetch("http://localhost:8080/book/all")
-        .then(response => response.json())
-        .then(data =>{
-            console.log("Data", data);
-            let html = "";
-            data.forEach(book => {
-                html += `
-                    <tr>
-                        <td>${book.id}</td>
-                        <td>${book.title}</td>
-                        <td>
-                            <button id="favorite-button${book.id}" class="favorite-button" onclick="saveOrDel(${book.id})">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `
-            });
-            document.getElementById('books-table').innerHTML = html;
-        })
-    console.log("Na fetch")    
-}
+// function findAll() {
+//     console.log("start met ophalen")
+//     fetch("http://localhost:8080/book/all")
+//         .then(response => response.json())
+//         .then(data =>{
+//             console.log("Data", data);
+//             let html = "";
+//             data.forEach(book => {
+//                 html += `
+//                     <tr>
+//                         <td>${book.id}</td>
+//                         <td>${book.title}</td>
+//                         <td>
+//                             <button id="favorite-button${book.id}" class="favorite-button" onclick="saveOrDel(${book.id})">
+//                                 <i class="far fa-heart"></i>
+//                             </button>
+//                         </td>
+//                     </tr>
+//                 `
+//             });
+//             document.getElementById('books-table').innerHTML = html;
+//         })
+//     console.log("Na fetch")    
+// }
 
 
 function getBooks() {
@@ -54,7 +54,7 @@ function findAllFavs(bookids) {
             console.log(bookids)
             for (let book of bookids){
                 console.log(book)
-                let favButton = document.getElementById(`favorite-button${book}`);
+                let favButton = document.getElementById(`fav${book}`);
                 if (favids.includes(book)) {
                     console.log("YES")
                     favButton.innerHTML = '<i class="fas fa-heart"></i>';
@@ -67,6 +67,7 @@ function findAllFavs(bookids) {
         })
     console.log("Na fetch")
 }
+
 
 function saveFavorite(bookId) {
     let userId = localStorage.getItem("WT_ID");
@@ -86,6 +87,7 @@ function saveFavorite(bookId) {
     })
     .then((response) => response.json())
 }
+
 
 function deleteFavorite(bookId) {
     let userId = localStorage.getItem("WT_ID");
@@ -113,13 +115,14 @@ function deleteFavorite(bookId) {
 }
 
 function saveOrDel(bookId){
-    let favButton = document.getElementById(`favorite-button${bookId}`);
+    let favButton = document.getElementById(`fav${bookId}`);
     let heartIcon = favButton.querySelector("i.fa-heart");
     if (heartIcon.classList.contains("far")) { //Favorites book
         console.log("Favorite")
         heartIcon.classList.remove("far");
         heartIcon.classList.add("fas");
         // Save Book to favorites in db...
+        // document.getElementById('addFav').innerHTML = "<span class='addFav'>Verwijder van favorieten</span>";
         saveFavorite(bookId)
 
     } else { //Unfavorites book
@@ -127,9 +130,10 @@ function saveOrDel(bookId){
         heartIcon.classList.remove("fas");
         heartIcon.classList.add("far");
         // Remove Book from favorites in db...
+        // document.getElementById('addFav').innerHTML ="<span class='addFav'>Toevoegen aan favorieten</span>";
         deleteFavorite(bookId);
     }
 }
 
-findAll();
+// findAll();
 getBooks();
