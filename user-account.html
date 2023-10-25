@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>De Bibliotheek Van De Toekomst</title>
 
     <!-- dit is de bootstrap link-->
     <link
@@ -39,31 +39,22 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="user-home.html">Home</a>
+              <a class="nav-link" aria-current="page" href="user-home.html">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="boeken-overzicht.html">Boeken overzicht</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="user-account.html"
-                >Account</a
-              >
-            </li>
+              <a class="nav-link active" href="user-account.html">Account</a>
+            </li> 
             <li class="nav-item">
-              <a class="nav-link" href="favorites.html">Favorieten</a>
+              <a class="nav-link" href="user-favorites.html">Favorieten</a>
             </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                href="index.html"
-                onclick="clearLocalStorage()"
-                >Log Uit</a
-              >
-            </li>
-          </ul>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
+              </li>
+            </ul>
         </div>
       </div>
     </nav>
@@ -122,20 +113,127 @@
       <li>Book3 Status: goedgekeurd</li>
     </ul>
 
-    <a href="example-book.html" target="_self">Go To Book Example</a>
+    <br /><br />
 
-    <a href="us.html" target="_self">Go Back To Main Site</a>
-    <a href="change-password.html" target="_self">Verander Wachtwoord</a>
-    <a href="change-email.html" target="_self">Verander Email</a>
-    <a href="change-phone-number.html" target="_self"
-      >Verander Telefoon Nummer</a
+    <!--BUTTONS uitrollende tabel van persoongegevens-->
+
+    <button id="changePasswordButton" type="button" class="btn btn-secondary">
+      Verander Wachtwoord
+    </button>
+
+    <button id="changeEmailButton" type="button" class="btn btn-secondary">
+      Verander Email
+    </button>
+
+    <button
+      id="changePhoneNumberButton"
+      type="button"
+      class="btn btn-secondary"
     >
+      Verander Telefoon Nummer
+    </button>
+
+    <button id="deleteUserButton" type="button" class="btn btn-danger">
+      Verwijder Mijn Account
+    </button>
+
+    <!-- Verander Wachtwoord -->
+
+    <form id="changePasswordForm" class="container" style="display: none">
+      <div class="mb-3">
+        <label for="current-password" class="form-label"
+          >Huidig Wachtwoord</label
+        >
+        <input type="password" class="form-control" id="current-password" />
+      </div>
+      <div class="mb-3">
+        <label for="new-password" class="form-label">New Password</label>
+        <input type="password" class="form-control" id="new-password" />
+      </div>
+      <div class="mb-3">
+        <label for="confirm-new-password" class="form-label"
+          >Bevestig Nieuw Wachtwoord</label
+        >
+        <input type="password" class="form-control" id="confirm-new-password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Verander Email-->
+
+    <form id="changeEmailForm" class="container" style="display: none">
+      <div class="mb-3">
+        <label for="current-email" class="form-label">Huidige Email</label>
+        <input type="email" class="form-control" id="current-email" />
+      </div>
+      <div class="mb-3">
+        <label for="new-email" class="form-label">Nieuwe Email</label>
+        <input type="email" class="form-control" id="new-email" />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Wachtwoord</label>
+        <input type="password" class="form-control" id="password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Verander telefoon nummer -->
+
+    <form id="changePhoneNumberForm" class="container" style="display: none">
+      <div class="mb-3">
+        <label for="current-phone-number" class="form-label"
+          >Huidig Telefoon Nummer</label
+        >
+        <input type="tel" class="form-control" id="current-phone-number" />
+      </div>
+      <div class="mb-3">
+        <label for="new-phone-number" class="form-label"
+          >Nieuw Telefoon Nummer</label
+        >
+        <input type="tel" class="form-control" id="new-phone-number" />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Wachtwoord</label>
+        <input type="password" class="form-control" id="password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Verwijder Account -->
+
+    <form id="deleteUserForm" class="container" style="display: none">
+
+      <div class="mb-3">
+        <label for="delete-user-email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="delete-user-email" />
+      </div>
+
+      <div class="mb-3">
+        <label for="delete-user-password" class="form-label">Wachtwoord</label>
+        <input type="password" class="form-control" id="delete-user-password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+
+
+
+
     <a href="favorites.html">Favoriete Boeken</a>
 
     <br /><br />
     <a href="review.html">review</a>
-    
-	
+
+    <a href="favorite-button.html">favorite</a>
+
+    <!-- FOOTER TODO, RAOUL-->
+    <footer class="bg-black text-white mt-5 p-4 text-center">
+      Copyright © 2023 The Bibliotheek Van De Toekomst
+    </footer>
+v
     <script src="script.js" defer></script>
     <!-- dit is de bootstrap link-->
     <script
@@ -143,5 +241,216 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      function toggleForm(targetFormId) {
+        // List of all form IDs
+        const formIds = [
+          "changePasswordForm",
+          "changeEmailForm",
+          "changePhoneNumberForm",
+          "deleteUserForm",
+        ];
+
+        // Loop through all form IDs
+        formIds.forEach((formId) => {
+          const form = document.getElementById(formId);
+          if (formId === targetFormId) {
+            // Toggle the visibility of the target form
+            if (form.style.display === "none" || form.style.display === "") {
+              form.style.display = "block";
+              form.scrollIntoView({ behavior: "smooth" }); // Smoothly scroll to the form
+            } else {
+              form.style.display = "none";
+            }
+          } else {
+            // Hide other forms
+            form.style.display = "none";
+          }
+        });
+      }
+
+      // Event listeners for the buttons
+      document
+        .getElementById("changePasswordButton")
+        .addEventListener("click", function () {
+          toggleForm("changePasswordForm");
+        });
+
+      document
+        .getElementById("changeEmailButton")
+        .addEventListener("click", function () {
+          toggleForm("changeEmailForm");
+        });
+
+      document
+        .getElementById("changePhoneNumberButton")
+        .addEventListener("click", function () {
+          toggleForm("changePhoneNumberForm");
+        });
+
+      document
+        .getElementById("deleteUserButton")
+        .addEventListener("click", function () {
+          toggleForm("deleteUserForm");
+        });
+
+      // voor de submit button van het changePasswordForm
+      document
+        .getElementById("changePasswordForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          changePassword();
+        });
+
+    
+      function changePassword() {
+        const confirmNewPassword = document.getElementById(
+          "confirm-new-password"
+        ).value;
+
+        const formData = {
+          currentPassword: document.getElementById("current-password").value,
+          newPassword: document.getElementById("new-password").value,
+        };
+
+        if (formData.newPassword != confirmNewPassword) {
+          alert("New password and confirm new password do not match");
+          return;
+        }
+
+        fetch("http://localhost:8080/user/changePassword", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success == 1) {
+              alert("Password changed successfully");
+            } else {
+              alert("Invalid email or password");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+        // */
+      }
+
+      // voor email submit button
+      document
+        .getElementById("changeEmailForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          changeEmail();
+        });
+
+      function changeEmail() {
+        const formData = {
+          currentEmail: document.getElementById("current-email").value,
+          newEmail: document.getElementById("new-email").value,
+          password: document.getElementById("password").value,
+        };
+
+        console.log(formData);
+
+        fetch("http://localhost:8080/user/changeEmail", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success == 1) {
+              alert("Email changed successfully");
+            } else {
+              alert("Invalid current email or password");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+        // */
+      }
+
+      // voor email submit button
+      document
+        .getElementById("changePhoneNumberForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          changePhoneNumber();
+        });
+
+      function changePhoneNumber() {
+        const formData = {
+          currentPhoneNumber: document.getElementById("current-phone-number")
+            .value,
+          newPhoneNumber: document.getElementById("new-phone-number").value,
+          password: document.getElementById("password").value,
+        };
+
+        console.log(formData);
+
+        fetch("http://localhost:8080/user/changePhoneNumber", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success == 1) {
+              alert("Phone Number changed successfully");
+            } else {
+              alert("Invalid current phone number or password");
+            }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+        // */
+      }
+
+      // for the deleteUserForm Submit Button
+
+      document
+        .getElementById("deleteUserForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          deleteUser();
+        });
+
+    
+      function deleteUser() {
+        const formData = {
+          password: document.getElementById("delete-user-password").value,
+          email: document.getElementById("delete-user-email").value,
+        };
+
+        fetch("http://localhost:8080/user/deleteUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => {
+          if (response.ok) {
+            clearLocalStorage();
+            alert("User deleted successfully");
+            window.location.href = "index.html";  // Redirect to index.html
+          } else {
+            alert("Invalid email or password");
+          }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+        // */
+      }
+
+    </script>
   </body>
 </html>
