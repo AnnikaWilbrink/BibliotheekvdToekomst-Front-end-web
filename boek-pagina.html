@@ -140,7 +140,7 @@
                                 </ul>
 
                                 <button class="wt-btn  border rounded-pill text-dark fw-bold" type="button" onclick="">
-                                    Reserveringsverzoek
+                                    <span class="addRes">Reserveringsverzoek</span>
                                 </button>
                                 <button class="fav-btn border rounded-pill fw-bold" id="fav${book.id}" onclick="saveOrDel(${book.id})">
                                     <span class="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>
@@ -193,6 +193,48 @@
                 getReviews(id).then(data => {
                     renderReviews(data);
                 })
+            }
+
+            function findAllFavs(book) {
+                let userId = localStorage.getItem("WT_ID");
+                let resids = [];
+                console.log("start met ophalen")
+                fetch(`http://localhost:8080/reservation/all/${userId}`)
+                    .then(response => response.json())
+                    .then(data =>{
+                        data.forEach(reservation => {
+                            resids.push(reservation.bookId);
+                        });
+                        console.log("USER:", userId);
+                        console.log("RESEVATIONS:", data);
+                        let resButton = document.getElementById(`res${book}`);
+                        if (resids.includes(parseInt(book))) {
+                            console.log("YES")
+                            resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
+                        } else {
+                            console.log("NO")
+                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span>';
+                        }
+                        
+                        
+                    })
+                console.log("Na fetch")
+            }
+
+            function saveReservation(){
+                let userId = localStorage.getItem("WT_ID")
+                let bookId = localStorage.getItem("WT_book")
+
+                fetch('http://localhost:8080/reservation/save', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => response.json())
+
             }
 
             function findAllFavs(book) {
