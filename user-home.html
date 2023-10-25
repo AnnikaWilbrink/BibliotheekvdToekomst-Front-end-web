@@ -317,7 +317,9 @@
 
           // Inserting the new button cell
           const cellButton = row.insertCell(4);
-          cellButton.innerHTML = '<button onclick="fetchBookInfo(${book.id})" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>';
+          if (book.returnedDate) { // only show a review button when you have already handed in the book
+            cellButton.innerHTML = `<button onclick="fetchBookInfo(${book.bookCopyId})" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>`;
+          }
 
         });
       }
@@ -325,7 +327,7 @@
 
 
       /////////// FOR THE REVIEW BUTTONS ///////////
-      
+
       // Check if user clicked a star to enable the save button
       var starElements = document.querySelectorAll("#rating [data-star]");
 
