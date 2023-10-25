@@ -92,19 +92,27 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
-            .then(data => {
-                if(data) {
+            .then(response => {
+                if (response.status === 200) {
                     alert('User registered successfully!');
-                    window.location.href = "index.html";  // Redirect to the login page
-                } else {
-                    alert('Error registering user.');
+                    window.location.href = "index.html";
+                } else if (response.status === 400) {
+                    alert("Please enter a password");
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch((error) => {
+                console.error(error);
             });
+            return
         }
+
+
+
+
+
+
+
+
     </script>
 </body>
 </html>

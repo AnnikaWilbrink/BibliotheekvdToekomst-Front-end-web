@@ -155,8 +155,6 @@
 
     function buildTables(data){
       data.forEach(reservation => {
-        // console.log(reservation)
-        defaultColors = ["primary", "danger"]
         if (reservation.deleted || reservation.borrowed){
           return;
         }
@@ -170,14 +168,6 @@
           declineButtonText = "Verwijderen";
           tableID = "approved"
         }
-        /*
-        if (reservation.approved && reservation.borrowed){
-          approveButtonText = "Contact";
-          declineButtonText = "Stel beschikbaar";
-          tableID = "borrowed"
-          defaultColors = ["greyscale", "greyscale"]
-        }
-        */
         html = "";
         html += `
         <tr>
@@ -197,7 +187,7 @@
         table.insertAdjacentHTML('beforeend', html);
         const approveButton = table.querySelector(`#approve_${reservation.id}`);
         const declineButton = table.querySelector(`#decline_${reservation.id}`);
-        approveButton.addEventListener('click', async function () {
+        approveButton.addEventListener('click', async function clickHandler() {
           if (reservation.approved){
             try{
               const responseData = await updateReservationStatus(reservation)
@@ -232,8 +222,10 @@
               console.error('Error updating reservation status:', error);
             });
           };
+          approveButton.removeEventListener("click", clickHandler)
           deleteTables();
           getReservations();
+          
         });        
         declineButton.addEventListener('click', () => {
           if (reservation.approved){
@@ -392,7 +384,7 @@
             </li>
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="index.html">Log Uit</a>
+                <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
               </li>
             </ul>
         </div>
@@ -402,7 +394,7 @@
     
 
     <div class="dashboard-container">
-      <h1>Jouw dashboard</h1>
+      <h1>Admin dashboard</h1>
       <h4>Reserveringsverzoeken</h4>
       <table class="table table-striped" id = "unapproved">
         <thead>
@@ -457,7 +449,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Selecteer exemplaar voor uitlening</h5>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -466,8 +458,8 @@
             <select class="form-select" aria-label="Default select example" id = "selectBookCopy">
               <!-- <option selected>Open this select menu</option> -->
             </select>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="createBorrowCloseModal" style="float: right;">Close</button>
-            <button type="button" class="btn btn-primary" id="createBorrowConfirmModal" style="float: right;">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="createBorrowCloseModal" style="float: right;">Sluiten</button>
+            <button type="button" class="btn btn-primary" id="createBorrowConfirmModal" style="float: right;">Exemplaar uitlenen</button>
             <div class="clearfix"></div>
           </div>
           <div class="modal-footer">
