@@ -1,97 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Front-desk Dashboard</title>
+  <head>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frontdesk Dashboard</title>
+    <!-- dit is de bootstrap link-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">
-            <img
-            src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
-            alt="WorkingTalent" width="150" 
-            />
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="frdesk-home.html">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="boeken-overzicht.html">Boeken overzicht</a>
-              </li>
-              <!-- <li class="nav-item">
-                <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
-              </li>-->
-              <li class="nav-item">
-                <a class="nav-link" href="admin-account.html">Account</a>
-              </li> 
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
-                </li>
-              </ul>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
+  
+  <script>
+
+    async function updateReservationStatus(reservation){
+      return new Promise(async (resolve, reject) => {
+          try{
+            await createBorrowedBook(reservation)
+            const response = await fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+                  method: "PUT",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  borrowed: true
+                  })
+                })
+              if (response.ok) {
+                const data = await response.json();
+                console.log("Status reservation updated to borrowed:", data);
+                resolve(data)
+              }
+              else{
+              console.error("Error updating reservation status to borrowed:", data.statusText);
+              reject(data)
+            }
+            } catch (error) {
+            console.error("An error occurred:", error);
+            reject(error); // Reject the promise with an error
+          }
+            
+    })
+  }
+
+    function borrowConfirmModal(){
+      return new Promise(async (resolve, reject) => {
+        try{
+          const selectBookCopy = document.getElementById("selectBookCopy");
+          const selectedIndex = selectBookCopy.selectedIndex;
+          const selectedOption = selectBookCopy.options[selectedIndex]
+          const Ids = JSON.parse(selectedOption.getAttribute("data-invisible-info"));
+          jQuery('#exampleModal').modal('hide');
+          selectBookCopy.innerHTML = ""
+          const response = await fetch(`http://localhost:8080/borrowed-book/save`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: Ids.userId,
+                  bookCopyId: Ids.bookCopyId,
+                  bookTitle: Ids.bookTitle
+                  })
+                })
+          if (response.ok) {
+            const data = await response.json();
+            console.log("Borrowed book created:", data);
+            const bookCopyResponse = await fetch(`http://localhost:8080/bookcopy/${Ids.bookCopyId}`, {
+              method: "PUT",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              available: false
+              })
+            })
+            if (bookCopyResponse.ok){
+                const bookCopyData = await bookCopyResponse.json();
+                console.log("Availability of bookcopy changed:", bookCopyData);
+                resolve(data); // Resolve the promise with the response data
+              }
+            else{
+              console.error("Error updating availability of bookcopy:", bookCopyResponse.statusText);
+              reject(data)
+            }
+            } else {
+            console.error("Error creating borrowed book:", response.statusText);
+            reject(response.statusText); // Reject the promise with an error
+            }
+        } catch (error) {
+          console.error("An error occurred:", error);
+          reject(error); // Reject the promise with an error
+        }
+        })
+      }
+           
+    function createBorrowedBook(reservation){
+      return new Promise((resolve, reject) => {
+        fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.available.length == 0){
+          alert("Er zijn momenteel geen exemplaren beschikbaar!")
+          reject("No available book copies");
+        }
+        else{
+        html = ''
+        for (let i = 0; i < data.available.length; i++) {
+          html += `<option value=${[i+1]} data-invisible-info='{"bookCopyId": ${data.availableIds[i]}, "userId": ${reservation.userId}, "bookTitle": "${reservation.bookTitle}"}'>${data.available[i]}</option>`
+        }
+        const selectBookCopy = document.getElementById("selectBookCopy");
+        selectBookCopy.insertAdjacentHTML('beforeend', html);
+        jQuery('#exampleModal').modal('show');
+        document.getElementById("createBorrowCloseModal").addEventListener("click", function() {
+          selectBookCopy.innerHTML = ""
+        });
+        document.getElementById("createBorrowConfirmModal").addEventListener("click", async function clickHandler() {
+          try {
+            createBorrowConfirmModal.removeEventListener("click", clickHandler)
+            const responseData = await borrowConfirmModal();
+            console.log("Response from borrowConfirmModal:", responseData);
+            resolve(responseData)
+          } catch (error) {
+            console.log("Error in borrowConfirmModal:", error);
+            reject(error);
+          }
+        })
+        
+      }
+    })
+    .catch(error => {
+      console.log("Error fetching book availability:", error);
+      reject(error);
+    });
+      })
+  }
+
+    function deleteTables(){
+      const tables = document.querySelectorAll('table');
+      tables.forEach(table => {
+      const headerRow = table.querySelector('thead tr'); 
+      if (headerRow) {
+        const rows = table.querySelectorAll('tbody tr'); 
+        rows.forEach(row => {
+          row.remove();
+        });
+      } else {
+        table.remove();
+      }
+      });
+      return;
+    }
+
+    function buildTables(data){
+      data.forEach(reservation => {
+        if (reservation.deleted || reservation.borrowed){
+          return;
+        }
+        if (reservation.approved && !reservation.borrowed){
+          approveButtonText = "Uitlenen";
+          declineButtonText = "Verwijderen";
+        }
+        html = "";
+        html += `
+        <tr>
+          <td>${reservation.id}</td>
+          <td>${reservation.userFirstName} ${reservation.userLastName}</td>
+          <td>${reservation.bookTitle}</td>
+          <td>
+            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="approve_${reservation.id}">
+              Uitlenen
+            </button>
+            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="decline_${reservation.id}">
+              Verwijderen
+            </button>
+          </td>
+        </tr>`;
+        const table = document.getElementById("approved");
+        table.insertAdjacentHTML('beforeend', html);
+        const approveButton = table.querySelector(`#approve_${reservation.id}`);
+        const declineButton = table.querySelector(`#decline_${reservation.id}`);
+        approveButton.addEventListener('click', async function clickHandler() {
+          if (reservation.approved){
+            try{
+              const responseData = await updateReservationStatus(reservation)
+              console.log("Response from updateReservationStatus:", responseData);
+              buildBorrowedBooksTable()
+            } catch (error) {
+              console.log("(Downstream) error in updateReservationStatus:", error);
+          }
+        }
+          else{
+            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+              method: "PUT",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              approved: true
+              })
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('Reservation status updated');
+              deleteTables();
+              getReservations();
+            })
+            .catch(error => {
+              console.error('Error updating reservation status:', error);
+            });
+          };
+          approveButton.removeEventListener("click", clickHandler)
+          deleteTables();
+          getReservations();
+          
+        });        
+        declineButton.addEventListener('click', () => {
+          if (reservation.approved){
+            confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+          }
+          if(!reservation.approved){
+            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
+          }
+          if (confirmation){
+            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+            method: "PUT",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              deleted: true
+            })
+          })
+            .then(response => {
+              deleteTables();
+              getReservations();
+            })
+          }
+        })
+      })
+      return;
+    }
+
+    function buildBorrowedBooksTable(){
+      fetch(`http://localhost:8080/borrowed-book/all`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(lending => {
+          if (lending.returnedDate == null){
+            html = "";
+            html += `
+            <tr>
+              <td>${lending.id}</td>
+              <td>${lending.userFirstName} ${lending.userLastName}</td>
+              <td>${lending.bookTitle}</td>
+              <td>${lending.bookCopyId}</td>
+              <td>
+                <button type="button" class="btn btn-greyscale btn-outline-secondary border rounded-pill fw-bold" id="contact_${lending.id}">
+                  Contact
+                </button>
+                <button type="button" class="btn btn-greyscale btn-outline-secondary border rounded-pill fw-bold" id="return_${lending.id}">
+                  Stel beschikbaar
+                </button>
+              </td>
+            </tr>`;
+            const table = document.getElementById("borrowed");
+            table.insertAdjacentHTML('beforeend', html);
+            const contactButton = table.querySelector(`#contact_${lending.id}`);
+            const returnButton = table.querySelector(`#return_${lending.id}`);
+            returnButton.addEventListener('click', () => {
+              confirmation = confirm("Weet je zeker dat je deze uitlening weer beschikbaar wilt stellen?")
+              if (confirmation){
+              
+                
+                fetch(`http://localhost:8080/borrowed-book/${lending.id}`, {
+                  method: "PUT",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  })
+                })
+                .then(response => {
+                  fetch(`http://localhost:8080/bookcopy/${lending.bookCopyId}`, {
+                  method: "PUT",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    available: true 
+                  })
+                })
+                .then(response => {
+                  deleteTables();
+                  getReservations();
+                  buildBorrowedBooksTable();
+                })
+              })
+            }
+          })
+        }
+      })
+    })
+    }
+                  
+    function getReservations(){
+      fetch(`http://localhost:8080/reservation/all`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        buildTables(data)
+      })
+    return;
+    }
+
+    function getBorrowedBooks(){
+      fetch(`http://localhost:8080/borrowed-book/all`, {
+        method: "GET",
+      })
+      .then(response => response.json())
+      .then(data => {
+        buildBorrowedBooksTable(data)
+      })
+      return;
+    }
+    
+  </script>
+  
+  </head>
+
+  <body>
+    
+    <script>
+      getReservations()
+      buildBorrowedBooksTable()
+    </script>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img
+      src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+      alt="WorkingTalent" width="150" 
+      />
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="frdesk-home.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="boeken-overzicht.html">Boeken overzicht</a>
+        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
+        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" href="admin-account.html">Account</a>
+        </li> 
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
+          </li>
+        </ul>
+    </div>
+  </div>
+</nav>
+
+
+    
+
+    <div class="dashboard-container">
+      <h1>Front-desk dashboard</h1>
+      <h4>Reserveringen</h4>
+      <table class="table table-striped" id = "approved">
+        <thead>
+          <tr>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Actie</em></th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+      <br>
+      
+      <h4>Uitleningen</h4>
+      <table class="table table-striped" id = "borrowed">
+        <thead>
+          <tr>
+            <th scope="col"><em>#</em></th>
+            <th scope="col"><em>Naam</em></th>
+            <th scope="col"><em>Boek</em></th>
+            <th scope="col"><em>Exemplaar</em></th>
+            <th scope="col"><em>Actie</em></th>
+          </tr>
+        </thead>
+        <tbody>
+      </tbody>
+      </table>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Selecteer exemplaar voor uitlening</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <select class="form-select" aria-label="Default select example" id = "selectBookCopy">
+              <!-- <option selected>Open this select menu</option> -->
+            </select>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="createBorrowCloseModal" style="float: right;">Sluiten</button>
+            <button type="button" class="btn btn-primary" id="createBorrowConfirmModal" style="float: right;">Exemplaar uitlenen</button>
+            <div class="clearfix"></div>
+          </div>
+          <div class="modal-footer">
+            ..
           </div>
         </div>
-      </nav>
-      
-      <div class="container px-1">
-        <h1 class="py-4">Front-desk Dashboard</h1>
-        <div>
-            <h2>Reserveringen</h2>
-            <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Naam</th>
-                    <th scope="col">Boek</th>
-                    <th scope="col">Actie</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Stephen Kwan</td>
-                    <td>Spring Framework</td>
-                    <td><input type="button" value="Uitlenen"> <input type="button" value="Verwijderen"></td>
-                  </tr>
-              </tbody>
-              </table>
-        </div>
-
-        <br><br>
-
-        <div>
-            <h2>Uitleningen</h2>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Naam</th>
-                    <th scope="col">Boek</th>
-                    <th scope="col">Actie</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Stephen Kwan</td>
-                    <td>Spring Framework</td>
-                    <td><input type="button" value="Contact"> <input type="button" value="Stel beschikbaar"></td>
-                </tr>
-            </tbody>
-            </table>
-        </div>
       </div>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     
-</body>
+    
+    <script src="script.js" defer></script>
+
+    <!-- dit is de bootstrap link-->
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+  </body>
 </html>
