@@ -81,7 +81,7 @@
                     <th scope="col"><em>Voornaam</em></th>
                     <th scope="col"><em>Achternaam</em></th>
                     <th scope="col"><em>Email</em></th>
-                    <th scope="col"><em>Registratie Datum</em></th>
+                    <!-- <th scope="col"><em>Registratie Datum</em></th> -->
                     <th scope="col"><em>Verwijderen</em></th>
                 </tr>
             </thead>
@@ -156,14 +156,14 @@
                 const cell3 = row.insertCell(2);
                 const cell4 = row.insertCell(3);
                 const cell5 = row.insertCell(4);
-                const cell6 = row.insertCell(5);
+                //const cell6 = row.insertCell(5);
 
                 cell1.innerHTML = user.id;
                 cell2.innerHTML = user.firstName;
                 cell3.innerHTML = user.lastName;
                 cell4.innerHTML = user.email;
-                cell5.innerHTML = 'nog veranderen in de DTO' //formatDate(user.registrationDate); // Ensure this date is formatted properly
-                cell6.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
+                //cell5.innerHTML = 'nog veranderen in de DTO' //formatDate(user.registrationDate); // Ensure this date is formatted properly
+                cell5.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
             });
         }
     </script>
