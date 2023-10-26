@@ -28,16 +28,16 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="user-home.html">Home</a>
+              <a class="nav-link" aria-current="page" href="frdesk-home.html">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="boeken-overzicht.html">Boeken overzicht</a>
+              <a class="nav-link  active" href="frdesk-boeken-overzicht.html">Boeken overzicht</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="user-account.html">Account</a>
+              <a class="nav-link" href="frdesk-account.html">Account</a>
             </li> 
             <li class="nav-item">
-              <a class="nav-link" href="user-favorites.html">Favorieten</a>
+              <a class="nav-link" href="frdesk-favorites.html">Favorieten</a>
             </li>
             <ul class="navbar-nav">
               <li class="nav-item">
@@ -66,9 +66,9 @@
             <!-- Type book -->
             <p class=" border-bottom"><strong>Boek, e-boek of luisterboek?</strong></p>
             
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="Boek" id="book-type-book" /> Boek</label><br>
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="boek" id="book-type-book" /> Boek</label><br>
             <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="e-boek" id="book-type-ebook" /> E-boek</label><br> 
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="Luisterboek" id="book-type-listenbook" /> Luisterboek</label><br>                     
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="luister" id="book-type-listenbook" /> Luisterboek</label><br>                     
 
             <!-- Beschikbaarheid -->
             <p class=" border-bottom"><strong>Beschikbaarheid</strong></p>
@@ -144,7 +144,7 @@
           document.body.insertAdjacentHTML("beforeend", html);
       }   
       addFooter()
-  </script>
+    </script>
 
     <script src="script.js" defer></script>
 
@@ -171,7 +171,7 @@
                         <p>Rating:</p>
                     </div>
                     <div class="card-footer">
-                      <a class="wt-btn border rounded-pill text-dark fw-bold" href="boek-pagina.html" onclick="makeLocalStorage(${book.id})">
+                      <a class="wt-btn border rounded-pill text-dark fw-bold" href="frdesk-boek-pagina.html" onclick="makeLocalStorage(${book.id})">
                         Bekijken
                       </a>
                       <button class="fav-btn border rounded-pill" id="fav${book.id}" onclick="saveOrDel(${book.id})">
@@ -240,13 +240,7 @@
           searchDto.filterWord = searchInput;
         }
 
-        // 3 -> Category
-        let isCategory = document.querySelector('input[name="bk-cat"]:checked')?.value;
-        if (!!isCategory) {
-          searchDto.isCategory = parseInt(isCategory);
-        }
-
-        // 6 - Rating
+        // 2 - Rating
         let searchRating = document.querySelector('input[name="review-rating"]:checked')?.value;
         if (!!searchRating) {
           searchDto.minReviewScore = parseInt(searchRating);
@@ -262,7 +256,6 @@
             },
             body: JSON.stringify(searchDto)
           });
-          console.log(searchDto)
 
           if (!response.ok) {
             throw new Error(`Error! status: ${response.status}`);

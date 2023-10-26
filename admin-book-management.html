@@ -106,6 +106,15 @@
     </div>
 
     <script>
+      async function addFooter() {
+          const resp = await fetch("footer.html");
+          const html = await resp.text();
+          document.body.insertAdjacentHTML("beforeend", html);
+      }   
+      addFooter()
+  </script>
+
+    <script>
       // async function deleteSelectedBooks() {
       //   const checkboxes = document.querySelectorAll('.form-check-input:checked');
       //   let bookIdsToDelete = [];
@@ -134,7 +143,7 @@
       //   });
       // }
       function getBookInfo(bookId) {
-        return fetch(`http://localhost:8080/book/info/${bookId}`)
+        return fetch(`http://localhost:8080/book/information/${bookId}`)
             .then(response => {
                 return response.json();
             });
