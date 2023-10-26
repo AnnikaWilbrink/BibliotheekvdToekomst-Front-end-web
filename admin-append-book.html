@@ -22,6 +22,7 @@
   </head>
 
   <body>
+    <div id="content" style="display: none">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -71,7 +72,7 @@
         </div>
       </div>
     </nav>
-
+    <script>authenticate()</script>
     <div class="container">
       <div class="row w-100">
         <div class="col-12">
@@ -148,6 +149,46 @@
       }
 
       async function submitForm() {
+      function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/admin`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    }
+
+      function submitForm() {
+        // Collect data from the form fields
+        const title = document.getElementById('title').value;
+        const author = document.getElementById('author').value;
+        const isbn = document.getElementById('isbn').value;
+        const subject = document.getElementById('subject').value;
+        const edition = document.getElementById('edition').value;
+        const category = document.getElementById('category').value;
+        const summary = document.getElementById('summary').value;
+        const coverUrl = document.getElementById('coverUrl').value;
+
         // Create a data object to send
         let formData = {
             title: document.getElementById('title').value,
@@ -191,5 +232,9 @@
 
     <!-- dit is de bootstrap link-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </div>
+    <div id="access-denied-message" style="display: none">
+      <p>Access Denied</p>
+    </div>
   </body>
 </html>

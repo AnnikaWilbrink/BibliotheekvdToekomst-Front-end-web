@@ -41,6 +41,10 @@
 
     }
 
+    function clearLocalStorage() {
+        localStorage.clear();
+      }
+
     async function updateReservationStatus(reservation){
       return new Promise(async (resolve, reject) => {
           try{
@@ -485,15 +489,6 @@
         })
         };
       
-    
-    function clearLocalStorage() {
-        localStorage.clear();
-      }
-  
-  
-  
-  
-  
   </script>
   
   </head>
