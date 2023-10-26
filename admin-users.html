@@ -1,0 +1,172 @@
+<!--TODO: overal bij admin in de navbar the Gebruikers knop toevoegen-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <!-- dit is de bootstrap link-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+
+    <!--NAV BAR-->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img
+            src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+            alt="WorkingTalent" width="150" 
+            />
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="admin-home.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="boeken-overzicht-admin.html">Boeken overzicht</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="admin-book-management.html">Boek management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="admin-account.html">Account</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="admin-favorites.html">Favorieten</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="admin-users.html">Gebruikers</a>
+              </li>
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.html">Log Uit</a>
+                </li>
+              </ul>
+          </div>
+        </div>
+      </nav>
+
+
+
+
+      <!-- TABLE USERS -->
+
+      <h4>Alle Gebruikers</h4>
+
+      <div class="container mt-5">
+        <table class="table table-striped" id="user-table">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Gebruikers ID</em></th>
+                    <th scope="col"><em>Voornaam</em></th>
+                    <th scope="col"><em>Achternaam</em></th>
+                    <th scope="col"><em>Email</em></th>
+                    <!-- <th scope="col"><em>Registratie Datum</em></th> -->
+                    <th scope="col"><em>Verwijderen</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fetch users with role 'user' when the page loads
+            fetchUsersByRole('user');
+        });
+
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(date).toLocaleDateString(undefined, options);
+        }
+
+        function deleteUserByAdmin(userId) {
+            // Ask for confirmation
+            let confirmation = window.confirm("Weet u zeker dat u de gebruiker wil verwijderen?");
+
+            if (!confirmation) {
+                return; // If the admin cancels the confirmation, just return and don't proceed with the deletion.
+            }
+
+          
+            fetch(`http://localhost:8080/user/${userId}`, {
+                method: 'DELETE',
+                Authorization: localStorage.getItem("WT_TOKEN"),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Refresh the user table
+                        fetchUsersByRole('user');
+                    } else {
+                        console.error('Error deleting user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                });
+        }
+
+        function fetchUsersByRole(role) {
+            fetch(`http://localhost:8080/user/role/${role}`)
+                .then(response => response.json())
+                .then(users => {
+                    populateUserTable(users);
+                })
+                .catch(error => {
+                    console.error('Error fetching users:', error);
+                });
+        }
+
+        function populateUserTable(users) {
+            const tableBody = document.getElementById('user-table').getElementsByTagName('tbody')[0];
+
+            // Clear any existing rows
+            tableBody.innerHTML = '';
+
+            // Insert each user into the table
+            users.forEach(user => {
+                const row = tableBody.insertRow();
+
+                // Assuming the API returns an id, firstName, lastName, email, and registrationDate for each user
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+                const cell5 = row.insertCell(4);
+                //const cell6 = row.insertCell(5);
+
+                cell1.innerHTML = user.id;
+                cell2.innerHTML = user.firstName;
+                cell3.innerHTML = user.lastName;
+                cell4.innerHTML = user.email;
+                //cell5.innerHTML = 'nog veranderen in de DTO' //formatDate(user.registrationDate); // Ensure this date is formatted properly
+                cell5.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
+            });
+        }
+    </script>
+
+  </body>
+</html>
