@@ -223,8 +223,6 @@
       fetchBorrowedBooks();
       fetchReservations();
       
-      let book = getBook(1);
-      console.log(book)
       getReviews().then(data => {
                     renderReviews(data);
       })
