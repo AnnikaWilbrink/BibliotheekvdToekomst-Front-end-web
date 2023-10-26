@@ -432,8 +432,6 @@
       </div>
     </nav>
 
-    
-
     <div class="dashboard-container">
       <h1>Admin dashboard</h1>
       <h4>Reserveringsverzoeken</h4>
@@ -545,7 +543,14 @@
       </div>
     </div>
 
-    
+    <script>
+      async function addFooter() {
+          const resp = await fetch("footer.html");
+          const html = await resp.text();
+          document.body.insertAdjacentHTML("beforeend", html);
+      }   
+      addFooter()
+  </script>
     
     <script src="script.js" defer></script>
 

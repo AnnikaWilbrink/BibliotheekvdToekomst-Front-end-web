@@ -139,15 +139,15 @@
 
       <br />
 
+
       <h4>Mijn reviews</h4>
-      <button
-        type="button"
-        class="btn btn-black btn-outline-secondary border rounded-pill fw-bold"
-        id="reviews"
-      >
-        Zie mijn reviews
-      </button>
+      <div id="reviewContainer"></div>
+        
+      </div>
+
     </div>
+
+
 
     <!-- Modal to write Review -->
     <div
@@ -209,10 +209,25 @@
     <script src="script.js" defer></script>
 
     <script>
-      // Fetch borrowed books and reserations on loading of the screen
-      window.onload = function () {
-        fetchReservations();
-        fetchBorrowedBooks();
+      async function addFooter() {
+          const resp = await fetch("footer.html");
+          const html = await resp.text();
+          document.body.insertAdjacentHTML("beforeend", html);
+      }   
+      addFooter()
+    </script>
+
+    <script> 
+      // Fetch borrowed books
+      window.onload = function() {
+      fetchBorrowedBooks();
+      fetchReservations();
+      
+      let book = getBook(1);
+      console.log(book)
+      getReviews().then(data => {
+                    renderReviews(data);
+      })
       };
 
       // extra help functions
@@ -462,6 +477,85 @@
                                             <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`;
         });
       }
+
+      
+
+
+      ///////// For review table //////////
+      async function getBook(id) {
+                try {
+                const response = await fetch(`http://localhost:8080/book/information/${id}`, {
+                method: 'GET',
+                });
+                
+                //if it doesn't work throw error
+                if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+      async function getReviews() {
+
+        let id = localStorage.getItem("WT_ID");
+        console.log("userid for review fetch " + id)
+
+          try {
+          const response = await fetch(`http://localhost:8080/review/user/${id}`, {
+          method: 'GET',
+          });
+          
+          //if it doesn't work throw error
+          if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data)
+          return data;
+          } catch (error) {
+              console.log(error);
+          }
+      }
+
+      function renderReviews(reviews){
+
+            let table = `
+            <table class="table table-striped" id="reviews">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Boek</em></th>
+                    <th scope="col"><em>Sterren</em></th>
+                    <th scope="col"><em>Text</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                    `;
+            
+            reviews.forEach(review => {
+              // const book = getBook(review.bookId)
+              // console.log(book)
+                table += `
+                <tr>
+                  <td>${review.bookTitle}</td>
+                  <td>${review.stars}</td>
+                  <td>${review.text}</td>
+
+
+            `;});
+
+
+            table += '</table>';
+
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = table;
+        }
+
     </script>
 
     <script>
@@ -470,12 +564,6 @@
       }
     </script>
 
-    <script>
-      // Initialize the carousel
-      var myCarousel = new bootstrap.Carousel(
-        document.getElementById("myCarousel")
-      );
-    </script>
 
     <!-- dit is de bootstrap link-->
     <script
