@@ -322,7 +322,7 @@
             jQuery('#contactModal').modal('show');
             // const modalFooter = document.getElementById("contact-modal-footer")
             // console.log("hoi")
-            document.getElementById("contactmodalsend").addEventListener("click", () => {
+            document.getElementById("contactmodalsend").addEventListener("click", function clickHandler() {
               confirmation = confirm("Bevestigen om email te versturen")
               if (confirmation){
                 const textBody = document.getElementById("message-text").value
@@ -341,15 +341,14 @@
               })
               .then(response => response.text())
               .then(data => {
-                console.log(data)
-              })
-          
-              
-              
+                contactButton.removeEventListener("click", clickHandler)
+                deleteTables();
+                getReservations();
+                buildBorrowedBooksTable();
+                jQuery('#contactModal').modal('hide');
+              }) 
             }
             })
-            
-            
         });
         }
       })
