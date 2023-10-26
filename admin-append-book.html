@@ -72,7 +72,7 @@
         </div>
       </div>
     </nav>
-    <script>authenticate()</script>
+
     <div class="container">
       <div class="row w-100">
         <div class="col-12">
@@ -175,10 +175,10 @@
                     console.error('Error:', error);
                 });
         });
-
+      }
     }
 
-      function submitForm() {
+      async function submitForm() {
         // Collect data from the form fields
         const title = document.getElementById('title').value;
         const author = document.getElementById('author').value;
@@ -228,6 +228,7 @@
           var url = document.getElementById('coverUrl').value;
           document.getElementById('coverPreview').src = url;
       }
+
     </script>
 
     <!-- dit is de bootstrap link-->
@@ -236,5 +237,6 @@
     <div id="access-denied-message" style="display: none">
       <p>Access Denied</p>
     </div>
+  <script>authenticate()</script>
   </body>
 </html>
