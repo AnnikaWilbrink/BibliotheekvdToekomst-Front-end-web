@@ -66,9 +66,9 @@
             <!-- Type book -->
             <p class=" border-bottom"><strong>Boek, e-boek of luisterboek?</strong></p>
             
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="boek" id="book-type-book" /> Boek</label><br>
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="Boek" id="book-type-book" /> Boek</label><br>
             <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="e-boek" id="book-type-ebook" /> E-boek</label><br> 
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="luister" id="book-type-listenbook" /> Luisterboek</label><br>                     
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="Luisterboek" id="book-type-listenbook" /> Luisterboek</label><br>                     
 
             <!-- Beschikbaarheid -->
             <p class=" border-bottom"><strong>Beschikbaarheid</strong></p>
@@ -137,9 +137,7 @@
       </div>
     </div>
 
-    <a href="example-book.html" target="_self">Go To Book Example</a>
-    <a href="user-dashboard.html" target="_self">Click Me For User Dashboard</a>
-    <a href="admin-dashboard.html" target="_self">Go Back To Admin Dashboard</a>
+
 
     <script src="script.js" defer></script>
 
@@ -235,7 +233,13 @@
           searchDto.filterWord = searchInput;
         }
 
-        // 2 - Rating
+        // 3 -> Category
+        let isCategory = document.querySelector('input[name="bk-cat"]:checked')?.value;
+        if (!!isCategory) {
+          searchDto.isCategory = parseInt(isCategory);
+        }
+
+        // 6 - Rating
         let searchRating = document.querySelector('input[name="review-rating"]:checked')?.value;
         if (!!searchRating) {
           searchDto.minReviewScore = parseInt(searchRating);
@@ -251,6 +255,7 @@
             },
             body: JSON.stringify(searchDto)
           });
+          console.log(searchDto)
 
           if (!response.ok) {
             throw new Error(`Error! status: ${response.status}`);
