@@ -12,6 +12,35 @@
   
   <script>
 
+    function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/admin`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    }
+
     async function updateReservationStatus(reservation){
       return new Promise(async (resolve, reject) => {
           try{
@@ -285,8 +314,6 @@
             returnButton.addEventListener('click', () => {
               confirmation = confirm("Weet je zeker dat je deze uitlening weer beschikbaar wilt stellen?")
               if (confirmation){
-              
-                
                 fetch(`http://localhost:8080/borrowed-book/${lending.id}`, {
                   method: "PUT",
                   headers: {
@@ -322,9 +349,10 @@
             jQuery('#contactModal').modal('show');
             // const modalFooter = document.getElementById("contact-modal-footer")
             // console.log("hoi")
-            document.getElementById("contactmodalsend").addEventListener("click", () => {
+            document.getElementById("contactmodalsend").addEventListener("click", function clickHandler() {
               confirmation = confirm("Bevestigen om email te versturen")
               if (confirmation){
+                
                 const textBody = document.getElementById("message-text").value
                 const subjectBody = document.getElementById("subject-text").value
                 const email = lending.userEmail
@@ -341,15 +369,12 @@
               })
               .then(response => response.text())
               .then(data => {
-                console.log(data)
-              })
-          
-              
-              
+                emailAddress.innerHTML = ''
+                document.getElementById("contactmodalsend").removeEventListener("click", clickHandler)
+                jQuery('#contactModal').modal('hide');
+              }) 
             }
             })
-            
-            
         });
         }
       })
@@ -460,6 +485,15 @@
         })
         };
       
+    
+    function clearLocalStorage() {
+        localStorage.clear();
+      }
+  
+  
+  
+  
+  
   </script>
   
   </head>
@@ -467,10 +501,11 @@
   <body>
     
     <script>
+      authenticate()
       getReservations()
       buildBorrowedBooksTable()
     </script>
-
+    <div id="content" style="display: none">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -501,9 +536,6 @@
             </li> 
             <li class="nav-item">
               <a class="nav-link" href="admin-favorites.html">Favorieten</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="admin-users.html">Gebruikers</a>
             </li>
             <ul class="navbar-nav">
               <li class="nav-item">
@@ -636,6 +668,13 @@
       }   
       addFooter()
   </script>
+ </div>
+
+ <div id="access-denied-message" style="display: none">
+  <p>Access Denied</p>
+</div>
+
+    
     
     <script src="script.js" defer></script>
 
