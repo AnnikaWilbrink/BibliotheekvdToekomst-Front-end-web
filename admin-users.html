@@ -21,7 +21,7 @@
     />
   </head>
   <body>
-
+    <div id="content" style="display: none">
     <!--NAV BAR-->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
@@ -59,14 +59,14 @@
               </li>
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="index.html">Log Uit</a>
+                  <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
                 </li>
               </ul>
           </div>
         </div>
       </nav>
 
-
+      <script>authenticate()</script>
 
 
       <!-- TABLE USERS -->
@@ -91,12 +91,50 @@
         </table>
     </div>
 
+    </div>
+
+    <div id="access-denied-message" style="display: none">
+      <p>Access Denied</p>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Fetch users with role 'user' when the page loads
             fetchUsersByRole('user');
         });
+
+        function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/admin`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    }
+
+        function clearLocalStorage() {
+            localStorage.clear();
+          }
 
         function formatDate(date) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
