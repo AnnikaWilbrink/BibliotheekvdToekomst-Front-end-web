@@ -182,7 +182,7 @@
             <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
           </div>`;
           
-      if (bookInfo.availablity == "beschikbaar") {
+      if (bookInfo.availability == "beschikbaar") {
         modal += `
         <div class="form-group">
             <label for="availability">Beschikbaarheid:</label><br>
@@ -226,7 +226,7 @@
         "subject": document.getElementById("subject").value,
         "edition": document.getElementById("edition").value,
         "category": document.getElementById("category").value,
-        "availablity": document.getElementById("availability").value,
+        "availability": document.getElementById("availability").value,
         "summary": document.getElementById("summary").value,
         "coverUrl": document.getElementById("coverUrl").value,
       }

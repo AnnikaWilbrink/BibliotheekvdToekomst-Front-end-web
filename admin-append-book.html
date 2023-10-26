@@ -78,7 +78,7 @@
           <h1>Nieuwe boek toevoegen</h1>
         </div>
         <div class="col-md-8">
-          <form action="http://localhost:8082/book/save" method="post">
+          <form>
             <div class="form-group">
               <label for="title">Titel:</label>
               <input type="text" id="title" name="title" class="form-control" required><br>
@@ -147,49 +147,40 @@
         localStorage.clear();
       }
 
-      function submitForm() {
-        // Collect data from the form fields
-        const title = document.getElementById('title').value;
-        const author = document.getElementById('author').value;
-        const isbn = document.getElementById('isbn').value;
-        const subject = document.getElementById('subject').value;
-        const edition = document.getElementById('edition').value;
-        const category = document.getElementById('category').value;
-        const summary = document.getElementById('summary').value;
-        const coverUrl = document.getElementById('coverUrl').value;
-
+      async function submitForm() {
         // Create a data object to send
-        const formData = {
-            title: title,
-            author: author,
-            isbn: isbn,
-            subject: subject,
-            edition: edition,
-            category: category,
-            summary: summary,
-            coverUrl: coverUrl 
+        let formData = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            isbn: document.getElementById('isbn').value,
+            subject: document.getElementById('subject').value,
+            edition: document.getElementById('edition').value,
+            category: document.getElementById('category').value,
+            summary: document.getElementById('summary').value,
+            coverUrl: document.getElementById('coverUrl').value 
         };
-
-        fetch('http://localhost:8082/book/save', {
+        console.log(formData)
+        try {
+        const response = await fetch(
+          'http://localhost:8080/book/save', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": localStorage.getItem("WT_TOKEN"),
             },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data) {  
-                alert('Book saved successfully!');
-                window.location.href = 'admin-book-management.html';
-            } else {
-                alert('There was an error saving the book. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('There was an error saving the book. Please check the console for more details.');
-        });
+            body: JSON.stringify(formData),
+          }
+        );
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        window.location.href = 'admin-book-management.html';
+        alert("Boek Opgeslagen!")
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       function displayImage() {
