@@ -57,6 +57,7 @@
             </div>
         </div>
         </nav>
+        </nav>
 
         <div class="parent-container d-flex">
             <!-- linker container-->
@@ -71,18 +72,24 @@
         </div>
 
         <script>
-            async function addFooter() {
-                const resp = await fetch("footer.html");
-                const html = await resp.text();
-                document.body.insertAdjacentHTML("beforeend", html);
-            }   
-            addFooter()
-        </script>
-
-
-        <script>
             id = localStorage.getItem('WT_book');
             console.log("id="+id)
+
+            function generateStarIcons(num) {
+                if (typeof num !== 'number' || num < 0 || num > 5) {
+                    return 'Invalid input';
+                }
+
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= num) {
+                        starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+                    } else {
+                        starsHTML += '<i class="bi bi-star text-warning"></i>';
+                    }
+                }
+                return starsHTML;
+            }
 
             async function getBook(id) {
                 try {
@@ -157,8 +164,8 @@
                                     <li>Editie: ${book.edition}</li>
                                 </ul>
 
-                                <button class="wt-btn  border rounded-pill text-dark fw-bold" type="button" onclick="">
-                                    Reserveringsverzoek
+                                <button class="wt-btn  border rounded-pill text-dark fw-bold" type="button" id=res${book.id} onclick="saveOrDelRes(${book.id})">
+                                    <span class="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>
                                 </button>
                                 <button class="fav-btn border rounded-pill fw-bold" id="fav${book.id}" onclick="saveOrDel(${book.id})">
                                     <span class="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>
@@ -185,9 +192,9 @@
                     table += `
                     <div>
                         <div class= row">
-                            <h4>Review door ${review.userId}</h4>
+                            <h4>Review door ${review.userFirstName}</h4>
+                            <h5>${generateStarIcons(review.stars)}</h5>
                             <ul>
-                            <li>Aantal sterren: ${review.stars}</li>
                             <li>${review.text}</li>
                             </ul>
                         </div>
@@ -234,7 +241,7 @@
                             resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
                         } else {
                             console.log("NO")
-                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span>';
+                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>';
                         }
                         
                     })
@@ -268,13 +275,15 @@
             function deleteReservation(id) {
                 let userId = localStorage.getItem("WT_ID");
                 
+                
                 let obj = {
-                    "bookId": bookid,
-                    "userId": userId
+                    "userId" : userId,
+                    "bookId" : id,
+                    "deleted": true
                 }
                 
-                fetch("http://localhost:8080/reservation/${id}", {
-                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                fetch("http://localhost:8080/reservation/delete", {
+                    method: "PUT", // Use the HTTP DELETE method to delete the favorite
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": localStorage.getItem("WT_TOKEN")
@@ -309,6 +318,7 @@
                     deleteReservation(bookId);
                 }
             }
+
             function findAllFavs(book) {
                 let userId = localStorage.getItem("WT_ID");
                 let favids = [];
@@ -329,8 +339,6 @@
                             console.log("NO")
                             favButton.innerHTML = '<span id="addFav">Toevoegen aan favorieten</span> <i class="far fa-heart"></i>';
                         }
-                        
-                        
                     })
                 console.log("Na fetch")
             }
@@ -402,6 +410,15 @@
             }
 
         </script>
+        <script>
+            async function addFooter() {
+                const resp = await fetch("footer.html");
+                const html = await resp.text();
+                document.body.insertAdjacentHTML("beforeend", html);
+            }   
+            addFooter()
+        </script>
+        
 
 </body>
 </html>

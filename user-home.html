@@ -185,9 +185,7 @@
       // Fetch borrowed books
       window.onload = function() {
       fetchBorrowedBooks();
-      
-      let book = getBook(1);
-      console.log(book)
+
       getReviews().then(data => {
                     renderReviews(data);
       })
@@ -381,23 +379,23 @@
 
 
       ///////// For review table //////////
-      async function getBook(id) {
-                try {
-                const response = await fetch(`http://localhost:8080/book/information/${id}`, {
-                method: 'GET',
-                });
-                
-                //if it doesn't work throw error
-                if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-                }
+       // Function to generate star icons
 
-                const data = await response.json();
-                return data;
-                } catch (error) {
-                    console.log(error);
-                }
-            }
+      function generateStarIcons(num) {
+          if (typeof num !== 'number' || num < 0 || num > 5) {
+              return 'Invalid input';
+          }
+
+          let starsHTML = '';
+          for (let i = 1; i <= 5; i++) {
+              if (i <= num) {
+                  starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+              } else {
+                  starsHTML += '<i class="bi bi-star text-warning"></i>';
+              }
+          }
+          return starsHTML;
+      }
 
       async function getReviews() {
 
@@ -442,7 +440,7 @@
                 table += `
                 <tr>
                   <td>${review.bookTitle}</td>
-                  <td>${review.stars}</td>
+                  <td>${generateStarIcons(review.stars)}</td>
                   <td>${review.text}</td>
 
 

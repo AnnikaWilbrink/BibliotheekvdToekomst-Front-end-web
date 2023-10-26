@@ -377,7 +377,89 @@
       })
       return;
     }
-    
+
+
+    ///////// For review table //////////
+       // Function to generate star icons
+
+      function generateStarIcons(num) {
+          if (typeof num !== 'number' || num < 0 || num > 5) {
+              return 'Invalid input';
+          }
+
+          let starsHTML = '';
+          for (let i = 1; i <= 5; i++) {
+              if (i <= num) {
+                  starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+              } else {
+                  starsHTML += '<i class="bi bi-star text-warning"></i>';
+              }
+          }
+          return starsHTML;
+      }
+
+      async function getReviews() {
+
+        let id = localStorage.getItem("WT_ID");
+        console.log("userid for review fetch " + id)
+
+          try {
+          const response = await fetch(`http://localhost:8080/review/user/${id}`, {
+          method: 'GET',
+          });
+          
+          //if it doesn't work throw error
+          if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data)
+          return data;
+          } catch (error) {
+              console.log(error);
+          }
+      }
+
+      function renderReviews(reviews){
+
+            let table = `
+            <table class="table table-striped" id="reviews">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Boek</em></th>
+                    <th scope="col"><em>Sterren</em></th>
+                    <th scope="col"><em>Text</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                    `;
+            
+            reviews.forEach(review => {
+              // const book = getBook(review.bookId)
+              // console.log(book)
+                table += `
+                <tr>
+                  <td>${review.bookTitle}</td>
+                  <td>${generateStarIcons(review.stars)}</td>
+                  <td>${review.text}</td>
+
+
+            `;});
+
+
+            table += '</table>';
+
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = table;
+        }
+
+        window.onload = function() {
+        getReviews().then(data => {
+                      renderReviews(data);
+        })
+        };
+      
   </script>
   
   </head>
@@ -480,6 +562,9 @@
         <tbody>
       </tbody>
       </table>
+
+      <h4>Mijn reviews</h4>
+      <div id="reviewContainer"></div></div>
 
     </div>
 
