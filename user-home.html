@@ -28,79 +28,116 @@
         color: orange;
       }
     </style>
-  
   </head>
 
   <body>
-
     <!-- NAV BAR -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <img
-          src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
-          alt="WorkingTalent" width="150" 
+            src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+            alt="WorkingTalent"
+            width="150"
           />
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="user-home.html">Home</a>
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="user-home.html"
+                >Home</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="boeken-overzicht.html">Boeken overzicht</a>
+              <a class="nav-link" href="boeken-overzicht.html"
+                >Boeken overzicht</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="user-account.html">Account</a>
-            </li> 
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="user-favorites.html">Favorieten</a>
             </li>
             <li class="nav-item">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
-                </li>
-              </ul>
+              <a
+                class="nav-link"
+                href="index.html"
+                onclick="clearLocalStorage()"
+                >Log Uit</a
+              >
             </li>
+          </ul>
         </div>
       </div>
     </nav>
 
-    <div class = "user-home-header">
+    <div class="user-home-header">
       <h1>Welkom <span id="WT_NAME"></span>!</h1>
     </div>
-  
+
     <script>
-      document.getElementById("WT_NAME").textContent = localStorage.getItem('WT_NAME');
+      document.getElementById("WT_NAME").textContent =
+        localStorage.getItem("WT_NAME");
     </script>
 
     <div class="dashboard-container">
       <h1>Jouw dashboard</h1>
 
-      <h4>Geschiedenis</h4>
-
+      <!-- Reserverings tabel -->
+      <h4>Reserveringen</h4>
       <div class="container mt-5">
-        <table class="table table-striped" id="history">
-            <thead>
-                <tr>
-                    <th scope="col"><em>Boek</em></th>
-                    <th scope="col"><em>Startdatum</em></th>
-                    <th scope="col"><em>Einddatum</em></th>
-                    <th scope="col"><em>Status</em></th>
-                    <th scope="col"><em>Review</em></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be inserted here dynamically -->
-            </tbody>
+        <table
+          class="table table-striped"
+          id="user-dashboard-reservation-table"
+        >
+          <thead>
+            <tr>
+              <th scope="col"><em>Boek Titel</em></th>
+              <th scope="col"><em>Reserverings Datum</em></th>
+              <th scope="col"><em>Status</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be inserted here dynamically -->
+          </tbody>
         </table>
       </div>
 
-      <br>
+      <!-- Geschiedenis tabel -->
+      <h4>Geschiedenis</h4>
+      <div class="container mt-5">
+        <table class="table table-striped" id="user-dashboard-history">
+          <thead>
+            <tr>
+              <th scope="col"><em>Boek Titel</em></th>
+              <th scope="col"><em>Startdatum</em></th>
+              <th scope="col"><em>Einddatum</em></th>
+              <th scope="col"><em>Status</em></th>
+              <th scope="col"><em>Review</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <br />
 
 
       <h4>Mijn reviews</h4>
@@ -169,6 +206,8 @@
       </div>
     </div>
 
+    <script src="script.js" defer></script>
+
     <script>
       async function addFooter() {
           const resp = await fetch("footer.html");
@@ -178,44 +217,105 @@
       addFooter()
     </script>
 
-    <script src="script.js" defer></script>
-
-
     <script> 
       // Fetch borrowed books
       window.onload = function() {
       fetchBorrowedBooks();
-
+      fetchReservations();
+      
+      let book = getBook(1);
+      console.log(book)
       getReviews().then(data => {
                     renderReviews(data);
       })
       };
 
+      // extra help functions
       function formatDate(date) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(date).toLocaleDateString(undefined, options);
       }
 
-      function fetchBorrowedBooks() {
-       
-        fetch("http://localhost:8080/user/borrowed-books-list", {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: localStorage.getItem("WT_TOKEN"),
-            }
+      // fetch from backend functions
+
+      function fetchReservations() {
+        fetch("http://localhost:8080/user/current-reservations", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
         })
-        .then(response => response.json())
-        .then(data => {
-            renderBorrowedBooks(data);
-        })
-        .catch(error => {
-            console.error('Error fetching borrowed books:', error);
+          .then((response) => response.json())
+          .then((data) => {
+            renderReservations(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching reservations:", error);
+          });
+      }
+
+      function renderReservations(reservations) {
+        const tableBody = document.querySelector(
+          "#user-dashboard-reservation-table tbody"
+        );
+        tableBody.innerHTML = ""; // Clear current rows
+
+        // Sort the reservations, approved reservations first, pending reservations later
+        reservations.sort((a, b) => {
+          // If both a and b have the same approval status, return 0 (no change in order)
+          if (a.approved === b.approved) return 0;
+
+          // If a is approved and b is not, place a before b (return -1)
+          if (a.approved && !b.approved) return -1;
+
+          // If b is approved and a is not, place b before a (return 1)
+          return 1;
+        });
+
+        reservations.forEach((reservation, index) => {
+          const row = tableBody.insertRow();
+
+          const cellBookTitle = row.insertCell(0);
+          cellBookTitle.textContent = reservation.bookTitle;
+
+          const cellReservationDate = row.insertCell(1);
+          cellReservationDate.textContent = formatDate(
+            reservation.reservationDate
+          );
+
+          const cellStatus = row.insertCell(2);
+          if (reservation.approved) {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Reservering Goedgekeurd</button>';
+          } else {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">In afwachting</button>';
+          }
         });
       }
 
+      function fetchBorrowedBooks() {
+        fetch("http://localhost:8080/user/borrowed-books-list", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            renderBorrowedBooks(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching borrowed books:", error);
+          });
+      }
+
       function renderBorrowedBooks(books) {
-        const tableBody = document.querySelector('#history tbody');
+        const tableBody = document.querySelector(
+          "#user-dashboard-history tbody"
+        );
         tableBody.innerHTML = ""; // Clear current rows
 
         // Sort the books: current books first, returned books later
@@ -229,31 +329,33 @@
           const row = tableBody.insertRow();
 
           const cellBookTitle = row.insertCell(0);
-          cellBookTitle.textContent = book.bookTitle; 
+          cellBookTitle.textContent = book.bookTitle;
 
           const cellStartDate = row.insertCell(1);
           cellStartDate.textContent = formatDate(book.borrowDate);
 
           const cellEndDate = row.insertCell(2);
-          cellEndDate.textContent = book.returnedDate ? formatDate(book.returnedDate) : '-';
+          cellEndDate.textContent = book.returnedDate
+            ? formatDate(book.returnedDate)
+            : "-";
 
           const cellStatus = row.insertCell(3);
           if (book.returnedDate) {
-              cellStatus.innerHTML = '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button>';
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button>';
           } else {
-              cellStatus.innerHTML = '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button>';
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button>';
           }
 
           // Inserting the new button cell
           const cellButton = row.insertCell(4);
-          if (book.returnedDate) { // only show a review button when you have already handed in the book
+          if (book.returnedDate) {
+            // only show a review button when you have already handed in the book
             cellButton.innerHTML = `<button onclick="fetchBookInfo(${book.bookCopyId})" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>`;
           }
-
         });
       }
-
-
 
       /////////// FOR THE REVIEW BUTTONS ///////////
 
@@ -375,6 +477,7 @@
                                             <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`;
         });
       }
+
       
 
 
@@ -453,9 +556,7 @@
             container.innerHTML = table;
         }
 
-
     </script>
-
 
     <script>
       function clearLocalStorage() {
@@ -465,6 +566,10 @@
 
 
     <!-- dit is de bootstrap link-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
