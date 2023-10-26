@@ -192,6 +192,8 @@
 
                 findAllFavs(id);
 
+                findAllRes(id)
+
                 getReviews(id).then(data => {
                     renderReviews(data);
                 })
@@ -200,7 +202,7 @@
             function findAllRes(book) {
                 let userId = localStorage.getItem("WT_ID");
                 let resids = [];
-                console.log("start met ophalen")
+                console.log("start met ophalen van reserveringen")
                 fetch(`http://localhost:8080/reservation/all/${userId}`)
                     .then(response => response.json())
                     .then(data =>{
@@ -250,7 +252,7 @@
                 let userId = localStorage.getItem("WT_ID");
                 
                 let obj = {
-                    "bookId": id,
+                    "bookId": bookid,
                     "userId": userId
                 }
                 
