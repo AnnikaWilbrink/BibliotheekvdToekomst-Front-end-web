@@ -30,16 +30,16 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                      <a class="nav-link" aria-current="page" href="user-home.html">Home</a>
+                      <a class="nav-link" aria-current="page" href="frdesk-home.html">Home</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link active" href="boeken-overzicht.html">Boeken overzicht</a>
+                      <a class="nav-link  active" href="frdesk-boeken-overzicht.html">Boeken overzicht</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="user-account.html">Account</a>
+                      <a class="nav-link" href="frdesk-account.html">Account</a>
                     </li> 
                     <li class="nav-item">
-                      <a class="nav-link" href="user-favorites.html">Favorieten</a>
+                      <a class="nav-link" href="frdesk-favorites.html">Favorieten</a>
                     </li>
                     <ul class="navbar-nav">
                       <li class="nav-item">
@@ -61,6 +61,15 @@
 
             </div>
         </div>
+
+        <script>
+            async function addFooter() {
+                const resp = await fetch("footer.html");
+                const html = await resp.text();
+                document.body.insertAdjacentHTML("beforeend", html);
+            }   
+            addFooter()
+        </script>
 
         <script>
             id = localStorage.getItem('WT_book');
@@ -382,15 +391,6 @@
             }
 
         </script>
-        <script>
-            async function addFooter() {
-                const resp = await fetch("footer.html");
-                const html = await resp.text();
-                document.body.insertAdjacentHTML("beforeend", html);
-            }   
-            addFooter()
-        </script>
-        
 
 </body>
 </html>

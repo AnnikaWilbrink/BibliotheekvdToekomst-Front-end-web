@@ -70,6 +70,15 @@
             </div>
         </div>
 
+        <script>
+            async function addFooter() {
+                const resp = await fetch("footer.html");
+                const html = await resp.text();
+                document.body.insertAdjacentHTML("beforeend", html);
+            }   
+            addFooter()
+        </script>
+
 
         <script>
             id = localStorage.getItem('WT_book');
@@ -77,7 +86,7 @@
 
             async function getBook(id) {
                 try {
-                const response = await fetch(`http://localhost:8080/book/info/${id}`, {
+                const response = await fetch(`http://localhost:8080/book/information/${id}`, {
                 method: 'GET',
                 });
                 
