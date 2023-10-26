@@ -217,7 +217,7 @@
                             resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
                         } else {
                             console.log("NO")
-                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span>';
+                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>';
                         }
                         
                     })
@@ -251,13 +251,15 @@
             function deleteReservation(id) {
                 let userId = localStorage.getItem("WT_ID");
                 
+                
                 let obj = {
-                    "bookId": bookid,
-                    "userId": userId
+                    "userId" : userId,
+                    "bookId" : id,
+                    "deleted": true
                 }
                 
-                fetch("http://localhost:8080/reservation/${id}", {
-                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                fetch("http://localhost:8080/reservation/delete", {
+                    method: "PUT", // Use the HTTP DELETE method to delete the favorite
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": localStorage.getItem("WT_TOKEN")

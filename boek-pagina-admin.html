@@ -77,7 +77,7 @@
 
             async function getBook(id) {
                 try {
-                const response = await fetch(`http://localhost:8080/book/info/${id}`, {
+                const response = await fetch(`http://localhost:8080/book/information/${id}`, {
                 method: 'GET',
                 });
                 
@@ -192,18 +192,114 @@
             }
 
             function loadAll(id){
-
+                
                 getBook(id).then(data => {
+                    console.log("boek data=" +data)
                     renderBook(data);
                 });
 
                 findAllFavs(id);
+
+                findAllRes(id)
 
                 getReviews(id).then(data => {
                     renderReviews(data);
                 })
             }
 
+            function findAllRes(book) {
+                let userId = localStorage.getItem("WT_ID");
+                let resids = [];
+                console.log("start met ophalen van reserveringen")
+                fetch(`http://localhost:8080/reservation/all/${userId}`)
+                    .then(response => response.json())
+                    .then(data =>{
+                        data.forEach(reservation => {
+                            resids.push(reservation.bookId);
+                        });
+                        console.log("USER:", userId);
+                        console.log("RESEVATIONS:", data);
+                        let resButton = document.getElementById(`res${book}`);
+                        if (resids.includes(parseInt(book))) {
+                            console.log("YES")
+                            resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
+                        } else {
+                            console.log("NO")
+                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span>';
+                        }
+                        
+                    })
+                console.log("Na fetch")
+            }
+
+            function saveReservation(){
+                let userId = localStorage.getItem("WT_ID")
+                let bookId = localStorage.getItem("WT_book")
+
+                let obj = {
+                    "bookId": bookId,
+                    "userId": userId,
+                    "approved": false,
+                    "deleted": false,
+                    "borrowed": false
+                    // "reservationDate": 
+                }
+
+                fetch('http://localhost:8080/reservation/save', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => response.json())
+
+            }
+
+            function deleteReservation(id) {
+                let userId = localStorage.getItem("WT_ID");
+                
+                let obj = {
+                    "bookId": bookid,
+                    "userId": userId
+                }
+                
+                fetch("http://localhost:8080/reservation/${id}", {
+                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("WT_TOKEN")
+                    },
+                    body: JSON.stringify(obj)
+                })
+                .then((response) => {
+                    if (response.status === 200) {
+                        console.log("Reservation deleted successfully");
+                    } else {
+                        console.log("Failed to delete reservation");
+                    }
+                });
+            }
+
+            function saveOrDelRes(bookId){
+                let resButton = document.getElementById(`res${bookId}`);
+                console.log(resButton)
+                let heartIcon = resButton.querySelector("i.fa-heart");
+                if (heartIcon.classList.contains("far")) { //Favorites book
+                    console.log("Reservation")
+                    resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
+                    // Save Book to favorites in db...
+                    saveReservation(bookId)
+
+                } else { //Unfavorites book
+                    console.log("Delete reservation")
+                    heartIcon.classList.remove("fas");
+                    heartIcon.classList.add("far");
+                    resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>';
+                    // Remove Book from favorites in db...
+                    deleteReservation(bookId);
+                }
+            }
             function findAllFavs(book) {
                 let userId = localStorage.getItem("WT_ID");
                 let favids = [];
