@@ -11,6 +11,63 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
   
   <script>
+    function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/frontdesk`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    }
+
+    async function updateReservationStatus(reservation){
+      return new Promise(async (resolve, reject) => {
+          try{
+            await createBorrowedBook(reservation)
+            const response = await fetch(`http://localhost:8080/reservation/${reservation.id}`, {
+                  method: "PUT",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  borrowed: true
+                  })
+                })
+              if (response.ok) {
+                const data = await response.json();
+                console.log("Status reservation updated to borrowed:", data);
+                resolve(data)
+              }
+              else{
+              console.error("Error updating reservation status to borrowed:", data.statusText);
+              reject(data)
+            }
+            } catch (error) {
+            console.error("An error occurred:", error);
+            reject(error); // Reject the promise with an error
+          }
+            
+    })
+  }
 
     async function updateReservationStatus(reservation){
       return new Promise(async (resolve, reject) => {
@@ -279,8 +336,6 @@
             returnButton.addEventListener('click', () => {
               confirmation = confirm("Weet je zeker dat je deze uitlening weer beschikbaar wilt stellen?")
               if (confirmation){
-              
-                
                 fetch(`http://localhost:8080/borrowed-book/${lending.id}`, {
                   method: "PUT",
                   headers: {
@@ -307,6 +362,42 @@
               })
             }
           })
+          contactButton.addEventListener('click', () => {
+            console.log(lending)
+            const emailAddress = document.getElementById("recipient-name")
+            html = ''
+            html += `<span type="text" id="recipient-mail-${lending.userId}">${lending.userEmail}</span>`
+            emailAddress.insertAdjacentHTML('beforeend', html)
+            jQuery('#contactModal').modal('show');
+            // const modalFooter = document.getElementById("contact-modal-footer")
+            // console.log("hoi")
+            document.getElementById("contactmodalsend").addEventListener("click", function clickHandler() {
+              confirmation = confirm("Bevestigen om email te versturen")
+              if (confirmation){
+                
+                const textBody = document.getElementById("message-text").value
+                const subjectBody = document.getElementById("subject-text").value
+                const email = lending.userEmail
+                fetch(`http://localhost:8080/email/send`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    to: email,
+                    subject: subjectBody,
+                    message: textBody
+                  })
+              })
+              .then(response => response.text())
+              .then(data => {
+                emailAddress.innerHTML = ''
+                document.getElementById("contactmodalsend").removeEventListener("click", clickHandler)
+                jQuery('#contactModal').modal('hide');
+              }) 
+            }
+            })
+        });
         }
       })
     })
@@ -333,7 +424,91 @@
       })
       return;
     }
+
+    ///////// For review table //////////
+       // Function to generate star icons
+
+      function generateStarIcons(num) {
+          if (typeof num !== 'number' || num < 0 || num > 5) {
+              return 'Invalid input';
+          }
+
+          let starsHTML = '';
+          for (let i = 1; i <= 5; i++) {
+              if (i <= num) {
+                  starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+              } else {
+                  starsHTML += '<i class="bi bi-star text-warning"></i>';
+              }
+          }
+          return starsHTML;
+      }
+
+      async function getReviews() {
+
+        let id = localStorage.getItem("WT_ID");
+        console.log("userid for review fetch " + id)
+
+          try {
+          const response = await fetch(`http://localhost:8080/review/user/${id}`, {
+          method: 'GET',
+          });
+          
+          //if it doesn't work throw error
+          if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data)
+          return data;
+          } catch (error) {
+              console.log(error);
+          }
+      }
+
+      function renderReviews(reviews){
+
+            let table = `
+            <table class="table table-striped" id="reviews">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Boek</em></th>
+                    <th scope="col"><em>Sterren</em></th>
+                    <th scope="col"><em>Text</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                    `;
+            
+            reviews.forEach(review => {
+              // const book = getBook(review.bookId)
+              // console.log(book)
+                table += `
+                <tr>
+                  <td>${review.bookTitle}</td>
+                  <td>${generateStarIcons(review.stars)}</td>
+                  <td>${review.text}</td>
+
+
+            `;});
+
+
+            table += '</table>';
+
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = table;
+        }
+
+        window.onload = function() {
+        getReviews().then(data => {
+                      renderReviews(data);
+        })
+        };
     
+    function clearLocalStorage() {
+        localStorage.clear();
+      }
   </script>
   
   </head>
@@ -341,10 +516,11 @@
   <body>
     
     <script>
+      authenticate()
       getReservations()
       buildBorrowedBooksTable()
     </script>
-
+<div id="content" style="display: none">
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
@@ -413,6 +589,9 @@
       </tbody>
       </table>
 
+      <h4>Mijn reviews</h4>
+      <div id="reviewContainer"></div></div>
+
     </div>
 
     <!-- Modal -->
@@ -448,6 +627,11 @@
       }   
       addFooter()
     </script>
+  </div>
+
+  <div id="access-denied-message" style="display: none">
+    <p>Access Denied</p>
+  </div>
     
     <script src="script.js" defer></script>
 

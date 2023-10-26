@@ -63,17 +63,24 @@
         </div>
 
         <script>
-            async function addFooter() {
-                const resp = await fetch("footer.html");
-                const html = await resp.text();
-                document.body.insertAdjacentHTML("beforeend", html);
-            }   
-            addFooter()
-        </script>
-
-        <script>
             id = localStorage.getItem('WT_book');
             console.log("id="+id)
+
+            function generateStarIcons(num) {
+                if (typeof num !== 'number' || num < 0 || num > 5) {
+                    return 'Invalid input';
+                }
+
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= num) {
+                        starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+                    } else {
+                        starsHTML += '<i class="bi bi-star text-warning"></i>';
+                    }
+                }
+                return starsHTML;
+            }
 
             async function getBook(id) {
                 try {
@@ -176,9 +183,9 @@
                     table += `
                     <div>
                         <div class= row">
-                            <h4>Review door ${review.userId}</h4>
+                            <h4>Review door ${review.userFirstName}</h4>
+                            <h5>${generateStarIcons(review.stars)}</h5>
                             <ul>
-                            <li>Aantal sterren: ${review.stars}</li>
                             <li>${review.text}</li>
                             </ul>
                         </div>
@@ -200,6 +207,8 @@
 
                 findAllFavs(id);
 
+                findAllRes(id)
+
                 getReviews(id).then(data => {
                     renderReviews(data);
                 })
@@ -208,7 +217,7 @@
             function findAllRes(book) {
                 let userId = localStorage.getItem("WT_ID");
                 let resids = [];
-                console.log("start met ophalen")
+                console.log("start met ophalen van reserveringen")
                 fetch(`http://localhost:8080/reservation/all/${userId}`)
                     .then(response => response.json())
                     .then(data =>{
@@ -223,7 +232,7 @@
                             resButton.innerHTML = '<span id="addRes">Verwijder reservering</span> <i class="fas fa-heart"></i>';
                         } else {
                             console.log("NO")
-                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span>';
+                            resButton.innerHTML = '<span id="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>';
                         }
                         
                     })
@@ -257,13 +266,15 @@
             function deleteReservation(id) {
                 let userId = localStorage.getItem("WT_ID");
                 
+                
                 let obj = {
-                    "bookId": id,
-                    "userId": userId
+                    "userId" : userId,
+                    "bookId" : id,
+                    "deleted": true
                 }
                 
-                fetch("http://localhost:8080/reservation/${id}", {
-                    method: "DELETE", // Use the HTTP DELETE method to delete the favorite
+                fetch("http://localhost:8080/reservation/delete", {
+                    method: "PUT", // Use the HTTP DELETE method to delete the favorite
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": localStorage.getItem("WT_TOKEN")
@@ -391,6 +402,15 @@
             }
 
         </script>
+        <script>
+            async function addFooter() {
+                const resp = await fetch("footer.html");
+                const html = await resp.text();
+                document.body.insertAdjacentHTML("beforeend", html);
+            }   
+            addFooter()
+        </script>
+        
 
 </body>
 </html>

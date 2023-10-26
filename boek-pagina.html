@@ -66,6 +66,22 @@
             id = localStorage.getItem('WT_book');
             console.log("id="+id)
 
+            function generateStarIcons(num) {
+                if (typeof num !== 'number' || num < 0 || num > 5) {
+                    return 'Invalid input';
+                }
+
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= num) {
+                        starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+                    } else {
+                        starsHTML += '<i class="bi bi-star text-warning"></i>';
+                    }
+                }
+                return starsHTML;
+            }
+
             async function getBook(id) {
                 try {
                 const response = await fetch(`http://localhost:8080/book/information/${id}`, {
@@ -167,9 +183,9 @@
                     table += `
                     <div>
                         <div class= row">
-                            <h4>Review door ${review.userId}</h4>
+                            <h4>Review door ${review.userFirstName}</h4>
+                            <h5>${generateStarIcons(review.stars)}</h5>
                             <ul>
-                            <li>Aantal sterren: ${review.stars}</li>
                             <li>${review.text}</li>
                             </ul>
                         </div>
