@@ -15,7 +15,7 @@
 
 </head>
 <body onload=loadAll(id)>
-
+    <div id="content" style="display: none">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
@@ -408,9 +408,50 @@
                 const html = await resp.text();
                 document.body.insertAdjacentHTML("beforeend", html);
             }   
+
+            function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/admin`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    }
+
+    function clearLocalStorage() {
+        localStorage.clear();
+      }
+
+
+            authenticate()
+
             addFooter()
+
         </script>
         
-
+    </div>
+    <div id="access-denied-message" style="display: none">
+        <p>Access Denied</p>
+      </div>
 </body>
 </html>
