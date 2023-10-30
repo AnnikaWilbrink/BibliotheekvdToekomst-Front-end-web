@@ -79,22 +79,22 @@
             <p class=" border-bottom"><strong>Minimale beoordeling</strong></p>
             
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="0" id="rating-0"  /> 
-              <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+              <i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i>
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="1" id="rating-1" />
-              <i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+              <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i> of hoger
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="2" id="rating-2" />
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+              <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i> of hoger
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="3" id="rating-3" />
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> of hoger
+              <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i> of hoger
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="4" id="rating-4" />
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> of hoger
+              <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star text-warning"></i> of hoger
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="5" id="rating-5" />
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i><i class="bi bi-star-fill text-warning"></i>
             </div>         
           </div>
         </div>
@@ -157,27 +157,30 @@
       }
 
       function renderBooks(data) {
-        let ol = '<div class="row row-cols-auto ">';
+          let ol = '<div class="row row-cols-auto ">';
 
-        data.forEach(book => {
-            ol += `
-            <div class="col">
-                <div class="card bg-light mb-3 mb-3">
-                    <img src="${book.coverUrl}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">${book.title}</h5>
-                        <p>Rating:</p>
-                    </div>
-                    <div class="card-footer">
-                      <a class="wt-btn border rounded-pill text-dark fw-bold" href="boek-pagina.html" onclick="makeLocalStorage(${book.id})">
-                        Bekijken
-                      </a>
-                      <button class="fav-btn border rounded-pill" id="fav${book.id}" onclick="saveOrDel(${book.id})">
-                        <i class="far fa-heart addFav"></i>
-                      </button>
-                    </div>
-                </div>
-            </div>`;
+          data.forEach(book => {
+              ol += `
+              <div class="col">
+                  <div class="card bg-light mb-3 mb-3">
+                      <img src="${book.coverUrl}" class="card-img-top" alt="...">
+                      <div class="card-body">
+                          <h5 class="card-title">${book.title}</h5>
+                          <p class="avg-rating" id="avg-rating-${book.id}"></p> <!-- Add an ID here -->
+                      </div>
+                      <div class="card-footer">
+                        <a class="wt-btn border rounded-pill text-dark fw-bold" href="boek-pagina.html" onclick="makeLocalStorage(${book.id})">
+                          Bekijken
+                        </a>
+                        <button class="fav-btn border rounded-pill" id="fav${book.id}" onclick="saveOrDel(${book.id})">
+                          <i class="far fa-heart addFav"></i>
+                        </button>
+                      </div>
+                  </div>
+              </div>`;
+              
+              // Calculate and set the average rating
+              getAvgRating(book.id);
           });
 
           ol += '</div>';
@@ -185,6 +188,125 @@
           const container = document.getElementById('booksContainer');
           container.innerHTML = ol;
       }
+
+      function getAvgRating(id) {
+          getReviews(id)
+              .then(reviews => {
+
+                  const avgRating = calculateAverageRating(reviews);
+                  const avgRatingElement = document.getElementById(`avg-rating-${id}`);
+
+                  if (avgRatingElement) {
+                      avgRatingElement.innerHTML = generateStarIcons(avgRating);
+                  }
+              })
+              .catch(error => {
+                  console.error(error);
+              });
+      }
+
+
+      async function getReviews(id) {
+                try {
+                const response = await fetch(`http://localhost:8080/review/book/${id}`, {
+                method: 'GET',
+                });
+                
+                //if it doesn't work throw error
+                if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data);
+                return data; // Return the array of reviews
+                } catch (error) {
+                console.log(error);
+                return []; // Return an empty array in case of an error
+                }
+            }
+
+
+      function calculateAverageRating(reviews) {
+          if (!Array.isArray(reviews) || reviews.length === 0) {
+              return 0; // No reviews, so the average is 0.
+          }
+
+          const totalStars = reviews.reduce((sum, review) => {
+          if (typeof review.stars === 'number') {
+              return sum + review.stars;
+          }
+          return sum; // Skip invalid stars
+          }, 0);
+
+        const averageRating = totalStars / reviews.length;
+
+        return isNaN(averageRating) ? 0 : averageRating; // Handle NaN case
+      }
+
+
+      // function generateStarIcons(num) {
+      //           if (typeof num !== 'number' || num < 0 || num > 5) {
+      //               return 'Invalid input';
+      //           }
+
+      //           let starsHTML = '';
+      //           for (let i = 1; i <= 5; i++) {
+      //               if (i <= num) {
+      //                   starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+      //               } else {
+      //                   starsHTML += '<i class="bi bi-star text-warning"></i>';
+      //               }
+      //           }
+      //           return starsHTML;
+      //       }
+
+    //   function generateStarIcons(num) {
+    //     if (typeof num !== 'number' || num < 0 || num > 5) {
+    //         return 'Invalid input';
+    //     }
+
+    //     const fullStars = Math.floor(num);
+    //     const halfStar = num - fullStars > 0.5;
+
+    //     let starsHTML = '';
+    //     for (let i = 1; i <= 5; i++) {
+    //         if (i <= fullStars) {
+    //             starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+    //         } else if (halfStar && i - fullStars === 0.5) {
+    //             starsHTML += '<i class="bi bi-star-half text-warning"></i>';
+    //         } else {
+    //             starsHTML += '<i class="bi bi-star text-warning"></i>';
+    //         }
+    //     }
+
+    //     return starsHTML;
+    // }
+
+
+    function generateStarIcons(num) {
+    if (typeof num !== 'number' || num < 0 || num > 5) {
+        return 'Invalid input';
+    }
+
+    const fullStar = '<i class="bi bi-star-fill text-warning"></i>';
+    const halfStar = '<i class="bi bi-star-half text-warning"></i>';
+    const emptyStar = '<i class="bi bi-star text-warning"></i>';
+
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= num - 0.5) {
+            starsHTML += fullStar;
+        } else if (i > num - 0.5 && i <= num) {
+            starsHTML += halfStar;
+        } else {
+            starsHTML += emptyStar;
+        }
+    }
+
+    return starsHTML;
+}
+
 
 
       // fetch all book from the database
@@ -215,6 +337,7 @@
       getBooks().then(data => {
         renderBooks(data);
       });
+
 
       // Bind the Enter key to the search function
       document.getElementById('search-input').addEventListener('keypress', function (e) {
