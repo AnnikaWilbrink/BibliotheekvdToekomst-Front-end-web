@@ -95,6 +95,9 @@
       //     renderBooks(data);
       //   });
       // }
+      function makeLocalStorage(id){
+        localStorage.setItem("WT_book", id)
+      }
 
       function authenticate(){
         document.addEventListener('DOMContentLoaded', function () {
@@ -269,9 +272,9 @@
                     <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${book.id}" onclick="archiveBook(${book.id})">
                       Archiveren
                     </button>
-                    <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="exemplaren_${book.id}" onclick="manageCopiesFor(${book.id})">
+                    <a class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="exemplaren_${book.id}" role="button" href="admin-book-copy-management.html" onclick="makeLocalStorage(${book.id})">
                       Exemplaren
-                    </button>
+                    </a>
                   </td>
               </tr>
           `;
@@ -380,49 +383,49 @@
         }        
       }
 
-      function manageCopiesFor(id){
-        localStorage.setItem("WT_book_manage", id);
-         // Redirect to the "admin-book-copy-management.html" page
-        window.location.href = "admin-book-copy-management.html";
-      }
-
-      // //search books function
-      // async function search_book() {
-      //   let input = document.getElementById('search-input').value;
-
-      //   if (!input) {
-      //     getBooks().then(data => {
-      //       renderBooks(data);
-      //     });
-      //     return; // if the input is empty, exit the function after fetching all books
-      //   }
-      //   try {
-      //     const response = await fetch('http://localhost:8080/book/search', {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json'
-      //       },
-      //       body: JSON.stringify({ searchWord: input })
-      //     });
-
-      //     if (!response.ok) {
-      //       throw new Error(`Error! status: ${response.status}`);
-      //     }
-
-      //     const data = await response.json();
-      //     renderBooks(data);
-
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
+      // function manageCopiesFor(id){
+      //   localStorage.setItem("WT_book_manage", id);
+      //    // Redirect to the "admin-book-copy-management.html" page
+      //   window.location.href = "admin-book-copy-management.html";
       // }
 
-      // // Bind the Enter key to the search function
-      // document.getElementById('search-input').addEventListener('keypress', function (e) {
-      //     if (e.key === 'Enter') {
-      //       search_book();
-      //     }
-      // });
+      // // //search books function
+      // // async function search_book() {
+      // //   let input = document.getElementById('search-input').value;
+
+      // //   if (!input) {
+      // //     getBooks().then(data => {
+      // //       renderBooks(data);
+      // //     });
+      // //     return; // if the input is empty, exit the function after fetching all books
+      // //   }
+      // //   try {
+      // //     const response = await fetch('http://localhost:8080/book/search', {
+      // //       method: 'POST',
+      // //       headers: {
+      // //         'Content-Type': 'application/json'
+      // //       },
+      // //       body: JSON.stringify({ searchWord: input })
+      // //     });
+
+      // //     if (!response.ok) {
+      // //       throw new Error(`Error! status: ${response.status}`);
+      // //     }
+
+      // //     const data = await response.json();
+      // //     renderBooks(data);
+
+      // //   } catch (error) {
+      // //     console.log(error);
+      // //   }
+      // // }
+
+      // // // Bind the Enter key to the search function
+      // // document.getElementById('search-input').addEventListener('keypress', function (e) {
+      // //     if (e.key === 'Enter') {
+      // //       search_book();
+      // //     }
+      // // });
 
     </script>
 
