@@ -39,10 +39,8 @@ async function addNav() {
         const html = await resp.text();
         document.body.insertAdjacentHTML("afterbegin", html);
 
-        // Get the current page's filename (e.g., user-home.html) and extract the part before ".html"
         const currentPage = location.pathname.split("/").slice(-1)[0].replace(".html", "");
 
-        // Define an object mapping page names to the corresponding link IDs
         const pageToLinkMap = {
         "user-home": "home-link",
         "boeken-overzicht": "book-link",
@@ -51,7 +49,6 @@ async function addNav() {
         "favorites": "fav-link",
         };
 
-        // Find the corresponding link by ID and add the "active" class to it
         const linkId = pageToLinkMap[currentPage];
         if (linkId) {
             const link = document.getElementById(linkId);
@@ -65,10 +62,8 @@ async function addNav() {
         const html = await resp.text();
         document.body.insertAdjacentHTML("afterbegin", html);
 
-        // Get the current page's filename (e.g., user-home.html) and extract the part before ".html"
         const currentPage = location.pathname.split("/").slice(-1)[0].replace(".html", "");
 
-        // Define an object mapping page names to the corresponding link IDs
         const pageToLinkMap = {
         "frdesk-home": "home-link",
         "boeken-overzicht": "book-link",
@@ -77,7 +72,6 @@ async function addNav() {
         "favorites": "fav-link",
         };
 
-        // Find the corresponding link by ID and add the "active" class to it
         const linkId = pageToLinkMap[currentPage];
         if (linkId) {
             const link = document.getElementById(linkId);
