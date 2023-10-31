@@ -1,29 +1,3 @@
-// function findAll() {
-//     console.log("start met ophalen")
-//     fetch("http://localhost:8080/book/all")
-//         .then(response => response.json())
-//         .then(data =>{
-//             console.log("Data", data);
-//             let html = "";
-//             data.forEach(book => {
-//                 html += `
-//                     <tr>
-//                         <td>${book.id}</td>
-//                         <td>${book.title}</td>
-//                         <td>
-//                             <button id="favorite-button${book.id}" class="favorite-button" onclick="saveOrDel(${book.id})">
-//                                 <i class="far fa-heart"></i>
-//                             </button>
-//                         </td>
-//                     </tr>
-//                 `
-//             });
-//             document.getElementById('books-table').innerHTML = html;
-//         })
-//     console.log("Na fetch")    
-// }
-
-
 function getBooks() {
     let bookids = []; 
     console.log("start met ophalen")
@@ -135,5 +109,4 @@ function saveOrDel(bookId){
     }
 }
 
-// findAll();
 getBooks();
