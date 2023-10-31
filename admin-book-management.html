@@ -13,7 +13,7 @@
 
   <body>
     <div id="content" style="display: none">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <!-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <img
@@ -54,7 +54,7 @@
             </ul>
         </div>
       </div>
-    </nav>
+    </nav> -->
 
     <div class="container">
       <div class="row">
@@ -110,14 +110,6 @@
       <p>Access Denied</p>
     </div>
 
-    <script>
-      async function addFooter() {
-          const resp = await fetch("footer.html");
-          const html = await resp.text();
-          document.body.insertAdjacentHTML("beforeend", html);
-      }   
-      addFooter()
-  </script>
 
     <script>
       // async function deleteSelectedBooks() {

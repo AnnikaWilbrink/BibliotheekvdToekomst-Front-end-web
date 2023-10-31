@@ -403,11 +403,6 @@
 
         </script>
         <script>
-            async function addFooter() {
-                const resp = await fetch("footer.html");
-                const html = await resp.text();
-                document.body.insertAdjacentHTML("beforeend", html);
-            }   
 
             function authenticate(){
         document.addEventListener('DOMContentLoaded', function () {
@@ -445,10 +440,8 @@
 
             authenticate()
 
-            addFooter()
-
         </script>
-        
+        <script src="script.js" defer></script>
     </div>
     <div id="access-denied-message" style="display: none">
         <p>Access Denied</p>
