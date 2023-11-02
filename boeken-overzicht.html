@@ -78,7 +78,7 @@
             <!-- Stars -->
             <p class=" border-bottom"><strong>Minimale beoordeling</strong></p>
             
-            <div><input class="form-check-input me-1" type="radio" name="review-rating" value="0" id="rating-0"  /> 
+            <div><input class="form-check-input me-1" type="radio" name="review-rating" value="0" id="rating-0" checked /> 
               <i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i><i class="bi bi-star text-warning"></i>
             </div>
             <div><input class="form-check-input me-1" type="radio" name="review-rating" value="1" id="rating-1" />
@@ -115,16 +115,12 @@
             </div>
           </div>
           <div class="col col-lg-2 mx-auto">
-            <div class="dropdown-center">
-              <button class="btn border btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Sorteren
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
-                <li><a class="dropdown-item" href="#">Alfabetisch </a></li>
-                <li><a class="dropdown-item" href="#">Rating</a></li>
-              </ul>
-            </div>
+            <select class="form-select" id="sortDropdown">
+              <option value="title_asc" selected>Title (A-Z)</option>
+              <option value="title_desc">Title (Z-A)</option>
+              <option value="review-rating_asc">Rating (Low to High)</option>
+              <option value="review-rating_desc">Rating (High to Low)</option>
+          </select>
           </div>
         </div>
 
@@ -152,11 +148,16 @@
         renderBooks(data);
       }
 
+      window.onload = function() {
+      filter_books();
+      };
+
       function makeLocalStorage(id){
         localStorage.setItem("WT_book", id)
       }
 
       function renderBooks(data) {
+        
           let ol = '<div class="row row-cols-auto ">';
 
           data.forEach(book => {
@@ -238,11 +239,12 @@
           }
           return sum; // Skip invalid stars
           }, 0);
-
+        
         const averageRating = totalStars / reviews.length;
-
+        console.log(averageRating)
         return isNaN(averageRating) ? 0 : averageRating; // Handle NaN case
       }
+
 
 
       // function generateStarIcons(num) {
@@ -304,7 +306,7 @@
         }
     }
 
-    return starsHTML;
+    return starsHTML + " ("+num+")";
 }
 
 
@@ -346,6 +348,22 @@
           }
       });
 
+      // Add event listeners for checkboxes
+      document.querySelectorAll('input[name="bk-cat"]').forEach(checkbox => {
+          checkbox.addEventListener('change', filter_books);
+      });
+
+      document.querySelectorAll('input[name="bk-sub"]').forEach(checkbox => {
+          checkbox.addEventListener('change', filter_books);
+      });
+
+      document.querySelectorAll('input[name="review-rating"]').forEach(checkbox => {
+          checkbox.addEventListener('change', filter_books);
+      });
+
+      // Add event listener for the dropdown menu
+      document.getElementById('sortDropdown').addEventListener('change', filter_books);
+
       
       //filter books funciton
       async function filter_books() {
@@ -373,12 +391,20 @@
           searchDto.minReviewScore = parseInt(searchRating);
         }
 
-        // Sorting:
-        // 1 - sorting field
-        // TODO
+        // Add the condition to return all books if minReviewScore is 0
+        if (searchDto.minReviewScore === 0) {
+            searchDto.minReviewScore = null;
+        }
 
-        // 2 - sorting order
-        // TODO
+        // Get the selected sorting criteria from the dropdown
+        const sortDropdown = document.getElementById('sortDropdown');
+        console.log(sortDropdown)
+        const selectedSort = sortDropdown.value.split('_'); // Split the value into [field, order]
+        const sortField = selectedSort[0];
+        const sortOrder = selectedSort[1];
+
+        searchDto.sortField = sortField;
+        searchDto.sortOrder = sortOrder;
       
         try {
           // hier de filter functie
