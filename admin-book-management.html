@@ -135,38 +135,38 @@
             });
       }
 
-      function createModal(bookId) {
-      let modal = "";
-      getBookInfo(bookId)
-        .then(bookInfo => {
-          updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
-          modal += `
-        <form id="updateForm">
-          <input type="hidden" id="book_id" name="book_id" value="">
-          <div class="form-group">
-            <label for="title">Titel:</label>
-            <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="author">Auteur:</label><br>
-            <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
-          </div> 
-          <div class="form-group">
-            <label for="isbn">ISBN:</label><br>
-            <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="subject">Onderwerp:</label><br>
-            <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="edition">Editie:</label><br>
-            <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="category">Categorie:</label><br>
-            <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
-          </div>`;
+    function createModal(bookId) {
+    let modal = "";
+    getBookInfo(bookId)
+      .then(bookInfo => {
+        updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
+        modal += `
+      <form id="updateForm">
+        <input type="hidden" id="book_id" name="book_id" value="">
+        <div class="form-group">
+          <label for="title">Titel:</label>
+          <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="author">Auteur:</label><br>
+          <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
+        </div> 
+        <div class="form-group">
+          <label for="isbn">ISBN:</label><br>
+          <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="subject">Onderwerp:</label><br>
+          <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="edition">Editie:</label><br>
+          <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="category">Categorie:</label><br>
+          <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
+        </div>`;
           
       if (bookInfo.availability == "beschikbaar") {
         modal += `

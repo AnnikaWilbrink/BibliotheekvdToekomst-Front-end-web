@@ -21,33 +21,27 @@
   </head>
 
   <body onload=loadAll(id)>
-
-    <div class="container">
-
+    <div id="content" style="display: none">
       <div class="container">
-        <div class="row">
-          <div class="col input-group">
-            <button type="button" class="btn btn-outline-secondary" id="decrement">-</button>
-            <input type="number" class="form-control text-center" id="number" min="1" max="20" value="1">
-            <button type="button" class="btn btn-outline-secondary" id="increment">+</button>
-          </div>
-          <div class="col">
-            <button class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="createBookCopy()">Exemplaar toevoegen</button>
+
+        <div class="container">
+          <div class="row">
+            <div class="col input-group">
+              <button type="button" class="btn btn-outline-secondary" id="decrement">-</button>
+              <input type="number" class="form-control text-center" id="number" min="1" max="20" value="1">
+              <button type="button" class="btn btn-outline-secondary" id="increment">+</button>
+            </div>
+            <div class="col">
+              <button class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="createBookCopy()">Exemplaar toevoegen</button>
+            </div>
           </div>
         </div>
+
+        <h3 id="header"></h2>
+        <div class="container" id="booksContainer"></div>
+        <h3>Gearchiveerde exemplaren</h3>
+        <div class="container" id="archivedContainer"></div>
       </div>
-      
-      
-
-      
-
-      <h2 id="header"></h2>
-      <div class="container" id="booksContainer"></div>
-    </div>
-    
-
-    <div id="content" style="display: none">
-    
     </div>
     
 
@@ -166,32 +160,64 @@
               </thead>
               <tbody>
             `;
+        
+        let tableArchived = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Exemplaarnummer</th>
+                  <th>Beschikbaar</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+            `;
 
         book.forEach(copy => {
           let availability = "";
           if (copy.available == 1) {
             availability = "Beschikbaar";
           } else {
-            availability = "Nier beschikbaar";
+            availability = "Niet beschikbaar";
           }
-          table += `
-            <tr data-id="${copy.id}">  
-              <td>${copy.copyNumber}</td>
-              <td>${availability}</td>
-              <td>
-                <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="delete_${copy.id}" onclick="delBookCopy(${copy.id})">
-                  Verwijderen
-                </button>
-              </td>
-            </tr>
-          `
+          
+
+          if (copy.archived == 0) {
+            console.log("DATA: "+ copy.archived)
+            table += `
+              <tr data-id="${copy.id}">  
+                <td>${copy.copyNumber}</td>
+                <td>${availability}</td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})">
+                    Archiveren
+                  </button>
+                </td>
+              </tr>
+            `
+          } else {
+            tableArchived += `
+              <tr data-id="${copy.id}">  
+                <td>${copy.copyNumber}</td>
+                <td>${availability}</td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="dearchiveren_${copy.id}" onclick="unarchiveBookCopy(${copy.id})">
+                    Dearchiveren
+                  </button>
+                </td>
+              </tr>
+            `
+          }
+
         });
-        table += `
+
+        let endtable = `
           </tbody>
           </table>
         `;
 
-        document.getElementById('booksContainer').innerHTML = table;
+        document.getElementById('booksContainer').innerHTML = table+endtable;
+        document.getElementById('archivedContainer').innerHTML = tableArchived+endtable;
       }
 
       // async function getHighestBookNumber() {
@@ -221,7 +247,6 @@
         for (let i=1; i<= numberInput; i++){
           let obj = {
           "available": true,
-          "copyNumber": i,
           "book": id
           }
           console.log(obj)
@@ -248,6 +273,50 @@
           }
         }
         location.reload();
+      }
+
+      async function archiveBookCopy(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/bookcopy/archive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek exemplaar gearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      async function unarchiveBookCopy(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/bookcopy/unarchive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek exemplaar gedearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }        
       }
 
       
