@@ -7,27 +7,69 @@
     <title>De Bibliotheek Van De Toekomst</title>
     
     <!-- dit is de bootstrap link-->
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css'>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .row{
+        width: 27em;
+      }
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    </style>
   </head>
 
-  <body>
+  <body onload=loadAll(id)>
     <div id="content" style="display: none">
-    <div class="container">
-      <div class="row">
-        <div class="col-3 text-start">
-          <button class="boek-toevoegen-btn btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="createBookCopy()">
-              Exemplaar toevoegen
-          </button>
+      <div class="container">
+
+        <div class="container">
+          <div class="row">
+            <div class="col input-group">
+              <button type="button" class="btn btn-outline-secondary" id="decrement">-</button>
+              <input type="number" class="form-control text-center" id="number" min="1" max="20" value="1">
+              <button type="button" class="btn btn-outline-secondary" id="increment">+</button>
+            </div>
+            <div class="col">
+              <button class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="createBookCopy()">Exemplaar toevoegen</button>
+            </div>
+          </div>
         </div>
+
+        <h3 id="header"></h2>
+        <div class="container" id="booksContainer"></div>
+        <h3>Gearchiveerde exemplaren</h3>
+        <div class="container" id="archivedContainer"></div>
       </div>
     </div>
-
-    <div class="container" id="booksContainer"></div>
+    
 
     <script>
+      id = parseInt(localStorage.getItem('WT_book'));
+      console.log("id="+id)
 
-function authenticate(){
+      document.addEventListener('DOMContentLoaded', function () {
+        const numberInput = document.getElementById('number');
+        const incrementButton = document.getElementById('increment');
+        const decrementButton = document.getElementById('decrement');
+
+        incrementButton.addEventListener('click', function () {
+          let currentValue = parseInt(numberInput.value);
+          if (currentValue < 20) {
+            numberInput.value = currentValue + 1;
+          }
+        });
+
+        decrementButton.addEventListener('click', function () {
+          let currentValue = parseInt(numberInput.value);
+          if (currentValue > 1) {
+            numberInput.value = currentValue - 1;
+          }
+        });
+      });
+
+      function authenticate(){
         document.addEventListener('DOMContentLoaded', function () {
             fetch(`http://localhost:8080/authenticate/admin`, {
                   method: "POST",
@@ -54,10 +96,59 @@ function authenticate(){
                 });
         });
 
-    }
+      }
+
+      function loadAll(id){         
+        getBook(id).then(data => {
+            console.log("boek data=" + data)
+            document.getElementById('header').innerHTML = `Exemplaren van <i>${data.title}, ${data.author}</i>`;
+        });
+        getBookCopies(id).then(data => {
+          console.log("boekcopy data=" + data)
+          renderCopies(data)
+        });
+      }
+
+      async function getBook(id) {
+        try {
+        const response = await fetch(`http://localhost:8080/book/information/${id}`, {
+        method: 'GET',
+        });
+        
+        //if it doesn't work throw error
+        if (!response.ok) {
+        throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data)
+        return data;
+        } catch (error) {
+            console.log(error);
+        }
+      }
+
+      async function getBookCopies(id) {
+        try {
+        const response = await fetch(`http://localhost:8080/bookcopy/book/${id}`, {
+        method: 'GET',
+        });
+        
+        //if it doesn't work throw error
+        if (!response.ok) {
+        throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data)
+        return data;
+        } catch (error) {
+            console.log(error);
+        }
+      }
 
 
-      function renderBooks(books) {
+      function renderCopies(book) {
         let table = `
             <table class="table">
               <thead>
@@ -68,70 +159,168 @@ function authenticate(){
                 </tr>
               </thead>
               <tbody>
-          `;
+            `;
+        
+        let tableArchived = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Exemplaarnummer</th>
+                  <th>Beschikbaar</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+            `;
 
-        books.forEach(bookCopy => {
-          table += `
-              <tr data-id="${bookCopy.id}">
-                  <td>${bookCopy.copyNumber}</td>
-                  <td>${bookCopy.available}</td>
-                  <td>
-                    <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${bookCopy.id}" onclick="archiveBookCopy(${bookCopy.id})">
-                      Archiveren
-                    </button>
-                  </td>
+        book.forEach(copy => {
+          let availability = "";
+          if (copy.available == 1) {
+            availability = "Beschikbaar";
+          } else {
+            availability = "Niet beschikbaar";
+          }
+          
+
+          if (copy.archived == 0) {
+            console.log("DATA: "+ copy.archived)
+            table += `
+              <tr data-id="${copy.id}">  
+                <td>${copy.copyNumber}</td>
+                <td>${availability}</td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})">
+                    Archiveren
+                  </button>
+                </td>
               </tr>
-          `;
+            `
+          } else {
+            tableArchived += `
+              <tr data-id="${copy.id}">  
+                <td>${copy.copyNumber}</td>
+                <td>${availability}</td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="dearchiveren_${copy.id}" onclick="unarchiveBookCopy(${copy.id})">
+                    Dearchiveren
+                  </button>
+                </td>
+              </tr>
+            `
+          }
+
         });
 
-        table += `
+        let endtable = `
           </tbody>
           </table>
         `;
 
-        const container = document.getElementById('booksContainer');
-        container.innerHTML = table;
+        document.getElementById('booksContainer').innerHTML = table+endtable;
+        document.getElementById('archivedContainer').innerHTML = tableArchived+endtable;
       }
 
-      // fetch all book from the database
-      async function getBooks() {
-        try {
-        const WT_book_manage = localStorage.getItem('WT_book_manage');
-        const response = await fetch(
-          `http://localhost:8082/bookcopy/book/${WT_book_manage}`,
-          {
-            method: 'GET',
-          },
-        );
+      // async function getHighestBookNumber() {
+      //   try {
+      //     const response = await fetch(`http://localhost:8080/highest-copy-number`, {
+      //     method: 'GET',
+      //   });
         
-        //if it doesn't work throw error
-        if (!response.ok) {
-          throw new Error(`Error! status: ${response.status}`);
+      //   //if it doesn't work throw error
+      //   if (!response.ok) {
+      //   throw new Error(`Error! status: ${response.status}`);
+      //   }
+
+      //   const data = await response.json();
+      //   console.log(data)
+      //   return data;
+      //   } catch (error) {
+      //       console.log(error);
+      //   }
+      // }
+
+      async function createBookCopy() {
+        let numberInput = document.getElementById("number").value;
+        // getHighestBookNumber().then(number => {
+        //     console.log("boekNumber=" + number)
+        // });
+        for (let i=1; i<= numberInput; i++){
+          let obj = {
+          "available": true,
+          "book": id
+          }
+          console.log(obj)
+          try {
+            
+            const response = await fetch(`http://localhost:8080/bookcopy/save`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                "Authorization": localStorage.getItem("WT_TOKEN")
+              },
+              body: JSON.stringify(obj),
+            });
+
+            if (response.ok) {
+              // Book copy saved successfully
+              console.log(`Book copy`);
+            } else {
+              // Handle any errors
+              console.error(`Failed to save book copy.`);
+            }
+          } catch (error) {
+            console.error(`An error occurred while saving book copy: ${error}`);
+          }
         }
+        location.reload();
+      }
+
+      async function archiveBookCopy(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/bookcopy/archive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
           const data = await response.json();
+          location.reload();
+          alert("Boek exemplaar gearchiveerd!")
           return data;
         } catch (error) {
           console.log(error);
         }
       }
+
+      async function unarchiveBookCopy(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/bookcopy/unarchive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek exemplaar gedearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }        
+      }
+
       
-      // for all the books that are fetched --> place them in table
-      getBooks().then(data => {
-        renderBooks(data);
-      });
-
-      function createBookCopy() {
-        // stuurt bookId naar backend, waar een bookCopy gemaakt wordt (met exemplaarnummer automatisch ++)
-        // ontvangt een boolean voor succes
-        // refesht pagina / renderBooks opnieuw
-      }
-
-      function archiveBookCopy(id) {
-        alert("Je archiveert boek exemplaar met nummer "+ id);
-        // stuurt bookCopyId naar backend, waar de archived property wordt aangepast
-        // ontvangt een boolean voor succes
-        // refresht pagina / renderBooks opnieuw
-      }
+      
 
     </script>
 

@@ -95,6 +95,9 @@
       //     renderBooks(data);
       //   });
       // }
+      function makeLocalStorage(id){
+        localStorage.setItem("WT_book", id)
+      }
 
       function authenticate(){
         document.addEventListener('DOMContentLoaded', function () {
@@ -132,38 +135,38 @@
             });
       }
 
-      function createModal(bookId) {
-      let modal = "";
-      getBookInfo(bookId)
-        .then(bookInfo => {
-          updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
-          modal += `
-        <form id="updateForm">
-          <input type="hidden" id="book_id" name="book_id" value="">
-          <div class="form-group">
-            <label for="title">Titel:</label>
-            <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="author">Auteur:</label><br>
-            <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
-          </div> 
-          <div class="form-group">
-            <label for="isbn">ISBN:</label><br>
-            <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="subject">Onderwerp:</label><br>
-            <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="edition">Editie:</label><br>
-            <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
-          </div>
-          <div class="form-group">
-            <label for="category">Categorie:</label><br>
-            <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
-          </div>`;
+    function createModal(bookId) {
+    let modal = "";
+    getBookInfo(bookId)
+      .then(bookInfo => {
+        updateButton = `<button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" onclick="updateBook(${bookId})">Aanpassen</button>`;
+        modal += `
+      <form id="updateForm">
+        <input type="hidden" id="book_id" name="book_id" value="">
+        <div class="form-group">
+          <label for="title">Titel:</label>
+          <input type="text" id="title" name="title" class="form-control" value="${bookInfo.title}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="author">Auteur:</label><br>
+          <input type="text" id="author" name="author" class="form-control" value="${bookInfo.author}" required><br>
+        </div> 
+        <div class="form-group">
+          <label for="isbn">ISBN:</label><br>
+          <input type="text" id="isbn" name="isbn" class="form-control" value="${bookInfo.isbn}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="subject">Onderwerp:</label><br>
+          <input type="text" id="subject" name="subject" class="form-control" value="${bookInfo.subject}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="edition">Editie:</label><br>
+          <input type="text" id="edition" name="edition" class="form-control" value="${bookInfo.edition}" required><br>
+        </div>
+        <div class="form-group">
+          <label for="category">Categorie:</label><br>
+          <input type="text" id="category" name="category" class="form-control" value="${bookInfo.category}" required><br>
+        </div>`;
           
       if (bookInfo.availability == "beschikbaar") {
         modal += `
@@ -269,9 +272,9 @@
                     <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${book.id}" onclick="archiveBook(${book.id})">
                       Archiveren
                     </button>
-                    <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="exemplaren_${book.id}" onclick="manageCopiesFor(${book.id})">
+                    <a class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="exemplaren_${book.id}" role="button" href="admin-book-copy-management.html" onclick="makeLocalStorage(${book.id})">
                       Exemplaren
-                    </button>
+                    </a>
                   </td>
               </tr>
           `;
@@ -380,49 +383,49 @@
         }        
       }
 
-      function manageCopiesFor(id){
-        localStorage.setItem("WT_book_manage", id);
-         // Redirect to the "admin-book-copy-management.html" page
-        window.location.href = "admin-book-copy-management.html";
-      }
-
-      // //search books function
-      // async function search_book() {
-      //   let input = document.getElementById('search-input').value;
-
-      //   if (!input) {
-      //     getBooks().then(data => {
-      //       renderBooks(data);
-      //     });
-      //     return; // if the input is empty, exit the function after fetching all books
-      //   }
-      //   try {
-      //     const response = await fetch('http://localhost:8080/book/search', {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json'
-      //       },
-      //       body: JSON.stringify({ searchWord: input })
-      //     });
-
-      //     if (!response.ok) {
-      //       throw new Error(`Error! status: ${response.status}`);
-      //     }
-
-      //     const data = await response.json();
-      //     renderBooks(data);
-
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
+      // function manageCopiesFor(id){
+      //   localStorage.setItem("WT_book_manage", id);
+      //    // Redirect to the "admin-book-copy-management.html" page
+      //   window.location.href = "admin-book-copy-management.html";
       // }
 
-      // // Bind the Enter key to the search function
-      // document.getElementById('search-input').addEventListener('keypress', function (e) {
-      //     if (e.key === 'Enter') {
-      //       search_book();
-      //     }
-      // });
+      // // //search books function
+      // // async function search_book() {
+      // //   let input = document.getElementById('search-input').value;
+
+      // //   if (!input) {
+      // //     getBooks().then(data => {
+      // //       renderBooks(data);
+      // //     });
+      // //     return; // if the input is empty, exit the function after fetching all books
+      // //   }
+      // //   try {
+      // //     const response = await fetch('http://localhost:8080/book/search', {
+      // //       method: 'POST',
+      // //       headers: {
+      // //         'Content-Type': 'application/json'
+      // //       },
+      // //       body: JSON.stringify({ searchWord: input })
+      // //     });
+
+      // //     if (!response.ok) {
+      // //       throw new Error(`Error! status: ${response.status}`);
+      // //     }
+
+      // //     const data = await response.json();
+      // //     renderBooks(data);
+
+      // //   } catch (error) {
+      // //     console.log(error);
+      // //   }
+      // // }
+
+      // // // Bind the Enter key to the search function
+      // // document.getElementById('search-input').addEventListener('keypress', function (e) {
+      // //     if (e.key === 'Enter') {
+      // //       search_book();
+      // //     }
+      // // });
 
     </script>
 
