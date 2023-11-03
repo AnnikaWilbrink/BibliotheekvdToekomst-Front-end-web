@@ -17,6 +17,11 @@
         -webkit-appearance: none;
         margin: 0;
       }
+
+      .custom-button[disabled] {
+        background-color: #eca3a9; /* Change the background color to a light red */
+        cursor: not-allowed;
+      }
     </style>
   </head>
 
@@ -189,12 +194,22 @@
                 <td>${copy.copyNumber}</td>
                 <td>${availability}</td>
                 <td>
-                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})">
+                  
+            `
+            if (copy.available == 1) {
+              table += `<button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})">
                     Archiveren
                   </button>
                 </td>
-              </tr>
-            `
+              </tr>`
+            } else {
+              table += `<button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold custom-button" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})" disabled>
+                    Archiveren
+                  </button>
+                </td>
+              </tr>`
+            }
+
           } else {
             tableArchived += `
               <tr data-id="${copy.id}">  
@@ -219,25 +234,6 @@
         document.getElementById('booksContainer').innerHTML = table+endtable;
         document.getElementById('archivedContainer').innerHTML = tableArchived+endtable;
       }
-
-      // async function getHighestBookNumber() {
-      //   try {
-      //     const response = await fetch(`http://localhost:8080/highest-copy-number`, {
-      //     method: 'GET',
-      //   });
-        
-      //   //if it doesn't work throw error
-      //   if (!response.ok) {
-      //   throw new Error(`Error! status: ${response.status}`);
-      //   }
-
-      //   const data = await response.json();
-      //   console.log(data)
-      //   return data;
-      //   } catch (error) {
-      //       console.log(error);
-      //   }
-      // }
 
       async function createBookCopy() {
         let numberInput = document.getElementById("number").value;
