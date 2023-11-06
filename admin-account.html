@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
@@ -11,66 +11,17 @@
   </head>
   <body>
 
-
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img
-          src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
-          alt="WorkingTalent" width="150" 
-          />
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="admin-home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="boeken-overzicht-admin.html">Boeken overzicht</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="admin-statistieken.html">Statistieken</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="admin-book-management.html">Boek management</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="admin-account.html">Account</a>
-            </li> 
-            <li class="nav-item">
-              <a class="nav-link" href="admin-favorites.html">Favorieten</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="admin-users.html">Gebruikers</a>
-            </li>
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="index.html">Log Uit</a>
-              </li>
-            </ul>
-        </div>
-      </div>
-    </nav>
-    
-
+    <div id="content" style="display: none">
      <!--BUTTONS uitrollende tabel van persoongegevens-->
-
-     <button id="changePasswordButton" type="button" class="btn btn-secondary">
+    <button id="changePasswordButton" type="button" class="btn btn-secondary" onclick="toggleForm('changePasswordForm')">
       Verander Wachtwoord
     </button>
 
-    <button id="changeEmailButton" type="button" class="btn btn-secondary">
+    <button id="changeEmailButton" type="button" class="btn btn-secondary" onclick="toggleForm('changeEmailForm')">
       Verander Email
     </button>
 
-    <button
-      id="changePhoneNumberButton"
-      type="button"
-      class="btn btn-secondary"
-    >
+    <button id="changePhoneNumberButton" type="button" class="btn btn-secondary" onclick="toggleForm('changePhoneNumberForm')">
       Verander Telefoon Nummer
     </button>
 
@@ -138,20 +89,37 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <script>
-      async function addFooter() {
-          const resp = await fetch("footer.html");
-          const html = await resp.text();
-          document.body.insertAdjacentHTML("beforeend", html);
-      }   
-      addFooter()
-    </script>
-
 
     <script>
-      function clearLocalStorage() {
-        localStorage.clear();
-      }
+      function authenticate(){
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(`http://localhost:8080/authenticate/admin`, {
+                  method: "POST",
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                  userId: localStorage.getItem("WT_ID"),
+                  role: localStorage.getItem("WT_ROLE"),
+                  token: localStorage.getItem("WT_TOKEN")
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log(data)
+                    if (data) {
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        document.getElementById('access-denied-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    }
+
     </script>
 
     <script>
@@ -181,24 +149,7 @@
         });
       }
 
-      // Event listeners for the buttons
-      document
-        .getElementById("changePasswordButton")
-        .addEventListener("click", function () {
-          toggleForm("changePasswordForm");
-        });
-
-      document
-        .getElementById("changeEmailButton")
-        .addEventListener("click", function () {
-          toggleForm("changeEmailForm");
-        });
-
-      document
-        .getElementById("changePhoneNumberButton")
-        .addEventListener("click", function () {
-          toggleForm("changePhoneNumberForm");
-        });
+      
 
       // voor de submit button van het changePasswordForm
       document
@@ -322,8 +273,13 @@
 
 
 
-    <script src="script.js" defer></script>
+    <script src="js/script.js" defer></script>
     <!-- dit is de bootstrap link-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </div>
+  <div id="access-denied-message" style="display: none">
+    <p>Access Denied</p>
+  </div>
+  <script>authenticate()</script>
   </body>
 </html>
