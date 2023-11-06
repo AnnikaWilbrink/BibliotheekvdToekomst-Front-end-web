@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>De Bibliotheek Van De Toekomst</title>
@@ -16,75 +16,22 @@
   </head>
   <body>
     <div id="content" style="display: none">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img
-            src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
-            alt="WorkingTalent"
-            width="150"
-          />
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="frdesk-home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="frdesk-boeken-overzicht.html">Boeken overzicht</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link  active" href="frdesk-account.html">Account</a>
-            </li> 
-            <li class="nav-item">
-              <a class="nav-link" href="frdesk-favorites.html">Favorieten</a>
-            </li>
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
-              </li>
-            </ul>
-        </div>
-      </div>
-    </nav>
-
-    <script>
-      function clearLocalStorage() {
-        localStorage.clear();
-      }
-    </script>
 
     <!--BUTTONS uitrollende tabel van persoongegevens-->
 
-    <button id="changePasswordButton" type="button" class="btn btn-secondary">
+    <button id="changePasswordButton" type="button" class="btn btn-secondary" onclick="toggleForm('changePasswordForm')">
       Verander Wachtwoord
     </button>
 
-    <button id="changeEmailButton" type="button" class="btn btn-secondary">
+    <button id="changeEmailButton" type="button" class="btn btn-secondary" onclick="toggleForm('changeEmailForm')">
       Verander Email
     </button>
 
-    <button
-      id="changePhoneNumberButton"
-      type="button"
-      class="btn btn-secondary"
-    >
+    <button id="changePhoneNumberButton" type="button" class="btn btn-secondary" onclick="toggleForm('changePhoneNumberForm')">
       Verander Telefoon Nummer
     </button>
 
-    <button id="deleteUserButton" type="button" class="btn btn-danger">
+    <button id="deleteUserButton" type="button" class="btn btn-danger" onclick="toggleForm('deleteUserForm')">
       Verwijder Mijn Account
     </button>
 
@@ -168,16 +115,7 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <script>
-      async function addFooter() {
-          const resp = await fetch("footer.html");
-          const html = await resp.text();
-          document.body.insertAdjacentHTML("beforeend", html);
-      }   
-      addFooter()
-  </script>
-
-    <script src="script.js" defer></script>
+    <script src="js/script.js" defer></script>
     <!-- dit is de bootstrap link-->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -212,31 +150,6 @@
           }
         });
       }
-
-      // Event listeners for the buttons
-      document
-        .getElementById("changePasswordButton")
-        .addEventListener("click", function () {
-          toggleForm("changePasswordForm");
-        });
-
-      document
-        .getElementById("changeEmailButton")
-        .addEventListener("click", function () {
-          toggleForm("changeEmailForm");
-        });
-
-      document
-        .getElementById("changePhoneNumberButton")
-        .addEventListener("click", function () {
-          toggleForm("changePhoneNumberForm");
-        });
-
-      document
-        .getElementById("deleteUserButton")
-        .addEventListener("click", function () {
-          toggleForm("deleteUserForm");
-        });
 
       // voor de submit button van het changePasswordForm
       document
