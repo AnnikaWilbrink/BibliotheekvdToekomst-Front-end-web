@@ -155,6 +155,8 @@
                                     <li>Editie: ${book.edition}</li>
                                 </ul>
 
+                                <p>Exemplaren beschikbaar: ${book.numberOfAvailableCopies}</p>
+
                                 <button class="wt-btn  border rounded-pill text-dark fw-bold" type="button" id=res${book.id} onclick="saveOrDelRes(${book.id})">
                                     <span class="addRes">Reserveringsverzoek</span> <i class="far fa-heart"></i>
                                 </button>
