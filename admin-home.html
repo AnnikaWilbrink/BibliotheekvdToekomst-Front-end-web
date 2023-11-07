@@ -10,38 +10,17 @@
   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
   
+    <script src="js/script.js"></script>
+
   <script>
 
-    function authenticate(){
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch(`http://localhost:8080/authenticate/admin`, {
-                  method: "POST",
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                  userId: localStorage.getItem("WT_ID"),
-                  role: localStorage.getItem("WT_ROLE"),
-                  token: localStorage.getItem("WT_TOKEN")
-                  })
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                    if (data) {
-                        document.getElementById('content').style.display = 'block';
-                    } else {
-                        document.getElementById('access-denied-message').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
+    let selectedReservationId = 0;
 
+    if (!isAdmin()) {
+      window.location.href = '/index.html';
     }
 
-    async function updateReservationStatus(reservation){
+    async function updateReservationStatus(reservation) {
       return new Promise(async (resolve, reject) => {
           try{
             await createBorrowedBook(reservation)
@@ -71,216 +50,144 @@
     })
   }
 
-    function borrowConfirmModal(){
-      return new Promise(async (resolve, reject) => {
-        try{
-          const selectBookCopy = document.getElementById("selectBookCopy");
-          const selectedIndex = selectBookCopy.selectedIndex;
-          const selectedOption = selectBookCopy.options[selectedIndex]
-          const Ids = JSON.parse(selectedOption.getAttribute("data-invisible-info"));
-          jQuery('#exampleModal').modal('hide');
-          selectBookCopy.innerHTML = ""
-          const response = await fetch(`http://localhost:8080/borrowed-book/save`, {
-                  method: "POST",
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                  userId: Ids.userId,
-                  bookCopyId: Ids.bookCopyId,
-                  bookTitle: Ids.bookTitle
-                  })
-                })
-          if (response.ok) {
-            const data = await response.json();
-            console.log("Borrowed book created:", data);
-            const bookCopyResponse = await fetch(`http://localhost:8080/bookcopy/${Ids.bookCopyId}`, {
-              method: "PUT",
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-              available: false
-              })
-            })
-            if (bookCopyResponse.ok){
-                const bookCopyData = await bookCopyResponse.json();
-                console.log("Availability of bookcopy changed:", bookCopyData);
-                resolve(data); // Resolve the promise with the response data
-              }
-            else{
-              console.error("Error updating availability of bookcopy:", bookCopyResponse.statusText);
-              reject(data)
-            }
-            } else {
-            console.error("Error creating borrowed book:", response.statusText);
-            reject(response.statusText); // Reject the promise with an error
-            }
-        } catch (error) {
-          console.error("An error occurred:", error);
-          reject(error); // Reject the promise with an error
-        }
-        })
-      }
-           
-    function createBorrowedBook(reservation){
-      return new Promise((resolve, reject) => {
-        fetch(`http://localhost:8080/book/availability/${reservation.bookId}`, {
-        method: "GET",
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.available.length == 0){
-          alert("Er zijn momenteel geen exemplaren beschikbaar!")
-          reject("No available book copies");
-        }
-        else{
-        html = ''
-        for (let i = 0; i < data.available.length; i++) {
-          html += `<option value=${[i+1]} data-invisible-info='{"bookCopyId": ${data.availableIds[i]}, "userId": ${reservation.userId}, "bookTitle": "${reservation.bookTitle}"}'>${data.available[i]}</option>`
-        }
-        const selectBookCopy = document.getElementById("selectBookCopy");
-        selectBookCopy.insertAdjacentHTML('beforeend', html);
-        jQuery('#exampleModal').modal('show');
-        document.getElementById("createBorrowCloseModal").addEventListener("click", function() {
-          selectBookCopy.innerHTML = ""
-        });
-        document.getElementById("createBorrowConfirmModal").addEventListener("click", async function clickHandler() {
-          try {
-            createBorrowConfirmModal.removeEventListener("click", clickHandler)
-            const responseData = await borrowConfirmModal();
-            console.log("Response from borrowConfirmModal:", responseData);
-            resolve(responseData)
-          } catch (error) {
-            console.log("Error in borrowConfirmModal:", error);
-            reject(error);
-          }
-        })
-        
-      }
-    })
-    .catch(error => {
-      console.log("Error fetching book availability:", error);
-      reject(error);
-    });
-      })
-  }
+    function selectBookCopy() {
+      // Book copy id, reservation id
+      let selectedBookCopyId = document.getElementById('selectBookCopy').value;
+      alert('selectedBookCopyId', selectedBookCopyId)
 
-    function deleteTables(){
-      const tables = document.querySelectorAll('table');
-      tables.forEach(table => {
-      const headerRow = table.querySelector('thead tr'); 
-      if (headerRow) {
-        const rows = table.querySelectorAll('tbody tr'); 
-        rows.forEach(row => {
-          row.remove();
-        });
-      } else {
-        table.remove();
+      let dto = {
+        reservationId: selectedReservationId
       }
-      });
-      return;
+
+      fetch(`http://localhost:8080/bookcopy/${selectedBookCopyId}/select`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dto)
+      })
+        .then(res => res.json())
+        .then(success => {
+          jQuery('#selectBookCopyModal').modal('hide');
+
+          buildTables();
+          buildBorrowedBooksTable();
+        })
+    }
+           
+    function showSelectBookCopy(reservationId, reservationBookId) {
+      selectedReservationId = reservationId
+
+      fetch(`http://localhost:8080/book/availability/${reservationBookId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.available.length == 0) {
+            alert("Er zijn momenteel geen exemplaren beschikbaar!")
+          } else {
+            let selectBookCopyHtml = ''
+            for (let i = 0; i < data.available.length; i++) {
+              selectBookCopyHtml += `<option value="${[i+1]}">${data.available[i]}</option>`
+            }
+
+            document.getElementById('selectBookCopy').innerHTML = selectBookCopyHtml;
+
+            jQuery('#selectBookCopyModal').modal('show');
+          } // else
+        }) // then
     }
 
-    function buildTables(data){
+    function deline(id, reservationApproved ) {
+      let confirmation = reservationApproved ? 
+        confirm("Weet je zeker dat je deze reservering wilt verwijderen?") :
+        confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?");
+
+      // Deze 6 regels kan in 1 regel
+      // if (reservation.approved){
+      //   confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
+      // }
+      // if(!reservation.approved){
+      //   confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
+      // }
+
+      if (confirmation) {
+        setApproveStatus(id, false);
+      }
+    }
+
+    function setApproveStatus(id, approved) {
+      let dto = {};
+      approved ? dto.approved = true : dto.deleted = true;
+
+      fetch(`http://localhost:8080/reservation/${id}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dto)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Reservation status updated');
+        getReservations();
+      })
+      .catch(error => {
+        console.error('Error updating reservation status:', error);
+      });      
+    }
+
+    function buildTables(data) {
+      let unapprovedHtml = "";
+      let approvedHtml = "";
+
       data.forEach(reservation => {
         if (reservation.deleted || reservation.borrowed){
           return;
         }
-        if (!reservation.approved){
+
+        let callFunction = null;
+        if (!reservation.approved) {
           approveButtonText = "Goedkeuren";
           declineButtonText = "Afkeuren";
-          tableID = "unapproved"
+
+          callFunction = `setApproveStatus(${reservation.id}, true)`
         }
-        if (reservation.approved && !reservation.borrowed){
+        if (reservation.approved && !reservation.borrowed) {
           approveButtonText = "Uitlenen";
           declineButtonText = "Verwijderen";
-          tableID = "approved"
+
+          callFunction = `showSelectBookCopy(${reservation.id}, ${reservation.bookId})`;
         }
-        html = "";
-        html += `
+
+        let reservationRowHtml = `
         <tr>
           <td>${reservation.id}</td>
           <td>${reservation.userFirstName} ${reservation.userLastName}</td>
           <td>${reservation.bookTitle}</td>
           <td>
-            <button type="button" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold" id="approve_${reservation.id}">
+            <button type="button" onclick="${callFunction}" class="btn btn-primary btn-outline-secondary border rounded-pill fw-bold">
               ${approveButtonText}
             </button>
-            <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="decline_${reservation.id}">
+            <button type="button" onclick="decline(${reservation.id}, ${reservation.approved})" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold">
               ${declineButtonText}
             </button>
           </td>
-        </tr>`;
-        const table = document.getElementById(tableID);
-        table.insertAdjacentHTML('beforeend', html);
-        const approveButton = table.querySelector(`#approve_${reservation.id}`);
-        const declineButton = table.querySelector(`#decline_${reservation.id}`);
-        approveButton.addEventListener('click', async function clickHandler() {
-          if (reservation.approved){
-            try{
-              const responseData = await updateReservationStatus(reservation)
-              console.log("Response from updateReservationStatus:", responseData);
-              buildBorrowedBooksTable()
-            } catch (error) {
-              console.log("(Downstream) error in updateReservationStatus:", error);
-          }
+        </tr>`
+
+        if (!reservation.approved) {
+          unapprovedHtml += reservationRowHtml;
         }
-          else{
-            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-              method: "PUT",
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-              approved: true
-              })
-            })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-              return response.json();
-            })
-            .then(data => {
-              console.log('Reservation status updated');
-              deleteTables();
-              getReservations();
-            })
-            .catch(error => {
-              console.error('Error updating reservation status:', error);
-            });
-          };
-          approveButton.removeEventListener("click", clickHandler)
-          deleteTables();
-          getReservations();
-          
-        });        
-        declineButton.addEventListener('click', () => {
-          if (reservation.approved){
-            confirmation = confirm("Weet je zeker dat je deze reservering wilt verwijderen?")
-          }
-          if(!reservation.approved){
-            confirmation = confirm("Weet je zeker dat je dit reserveringsverzoek wilt verwijderen?")
-          }
-          if (confirmation){
-            fetch(`http://localhost:8080/reservation/${reservation.id}`, {
-            method: "PUT",
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              deleted: true
-            })
-          })
-            .then(response => {
-              deleteTables();
-              getReservations();
-            })
-          }
-        })
+        if (reservation.approved && !reservation.borrowed) {
+          approvedHtml += reservationRowHtml;
+        }
       })
-      return;
+
+      document.getElementById('unapproved').innerHTML = unapprovedHtml;
+      document.getElementById('approved').innerHTML = approvedHtml;
     }
 
     function buildBorrowedBooksTable(){
@@ -333,7 +240,6 @@
                   })
                 })
                 .then(response => {
-                  deleteTables();
                   getReservations();
                   buildBorrowedBooksTable();
                 })
@@ -380,22 +286,17 @@
       })
     })
     }
-                  
-    function getReservations(){
-      fetch(`http://localhost:8080/reservation/all`, {
-        method: "GET",
-      })
-      .then(response => response.json())
-      .then(data => {
-        buildTables(data)
-      })
-    return;
+
+    function getReservations() {
+      fetch(`http://localhost:8080/reservation/all`)
+        .then(response => response.json())
+        .then(data => {
+          buildTables(data)
+        })
     }
 
     function getBorrowedBooks(){
-      fetch(`http://localhost:8080/borrowed-book/all`, {
-        method: "GET",
-      })
+      fetch(`http://localhost:8080/borrowed-book/all`)
       .then(response => response.json())
       .then(data => {
         buildBorrowedBooksTable(data)
@@ -492,15 +393,15 @@
   <body>
     
     <script>
-      authenticate()
       getReservations()
       buildBorrowedBooksTable()
     </script>
-    <div id="content" style="display: none">
+    <div id="content">
     <div class="dashboard-container">
       <h1>Admin dashboard</h1>
+
       <h4>Reserveringsverzoeken</h4>
-      <table class="table table-striped" id = "unapproved">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
@@ -509,14 +410,14 @@
             <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="unapproved">
         </tbody>
       </table>
 
       <br>
 
       <h4>Reserveringen</h4>
-      <table class="table table-striped" id = "approved">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
@@ -525,14 +426,14 @@
             <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="approved">
         </tbody>
       </table>
 
       <br>
       
       <h4>Uitleningen</h4>
-      <table class="table table-striped" id = "borrowed">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col"><em>#</em></th>
@@ -542,8 +443,8 @@
             <th scope="col"><em>Actie</em></th>
           </tr>
         </thead>
-        <tbody>
-      </tbody>
+        <tbody id="borrowed">
+        </tbody>
       </table>
 
       <h4>Mijn reviews</h4>
@@ -552,25 +453,26 @@
     </div>
 
     <!-- Select bookcopy modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal fade" id="selectBookCopyModal" tabindex="-1" role="dialog" aria-labelledby="selectBookCopyModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Selecteer exemplaar voor uitlening</h5>
+            <h5 class="modal-title" id="selectBookCopyModalLabel">Selecteer exemplaar voor uitlening</h5>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <select class="form-select" aria-label="Default select example" id = "selectBookCopy">
+            <select class="form-select" aria-label="Default select example" id="selectBookCopy">
               <!-- <option selected>Open this select menu</option> -->
             </select>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="createBorrowCloseModal" style="float: right;">Sluiten</button>
-            <button type="button" class="btn btn-primary" id="createBorrowConfirmModal" style="float: right;">Exemplaar uitlenen</button>
+
             <div class="clearfix"></div>
           </div>
           <div class="modal-footer">
-            ..
+            <button type="button" class="btn btn-secondary text-start" data-bs-dismiss="modal">Sluiten</button>
+            <button type="button" class="btn btn-primary text-end" onclick="selectBookCopy()">Exemplaar uitlenen</button>
           </div>
         </div>
       </div>
@@ -611,13 +513,6 @@
       </div>
     </div>
  </div>
-
-  <div id="access-denied-message" style="display: none">
-    <p>Access Denied</p>
-  </div>
-    
-    
-    <script src="js/script.js" defer></script>
 
     <!-- dit is de bootstrap link-->
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
