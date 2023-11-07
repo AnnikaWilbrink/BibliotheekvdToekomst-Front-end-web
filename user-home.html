@@ -1,109 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>De Bibliotheek Van De Toekomst</title>
 
     <!-- dit is de bootstrap link-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      .fa {
+        font-size: 1.5em;
+        color: gray;
+        cursor: pointer;
+      }
+
+      .fa:hover {
+        color: orange;
+      }
+    </style>
   </head>
 
   <body>
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img
-          src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
-          alt="WorkingTalent" width="150" 
-          />
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="user-home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="user-boeken.html">Boeken</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="user-account.html">Account</a>
-            </li> 
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" href="index.html" onclick="clearLocalStorage()">Log Uit</a>
-              </li>
-            </ul>
-        </div>
-      </div>
-    </nav>
-
-    <script>
-      function clearLocalStorage() {
-        localStorage.clear();
-      }
-    </script>
-
-    <div class = "user-home-header">
+    <div class="user-home-header">
       <h1>Welkom <span id="WT_NAME"></span>!</h1>
     </div>
-  
+
     <script>
-      document.getElementById("WT_NAME").textContent = localStorage.getItem('WT_NAME');
+      document.getElementById("WT_NAME").textContent =
+        localStorage.getItem("WT_NAME");
     </script>
 
     <div class="dashboard-container">
       <h1>Jouw dashboard</h1>
-      <h4>Leningen [Geschiedenis]</h4>
-      <table class="table table-striped" id = "history">
-        <thead>
-          <tr>
-            <th scope="col"><em>#</em></th>
-            <th scope="col"><em>Naam</em></th>
-            <th scope="col"><em>Boek</em></th>
-            <th scope="col"><em>Startdatum</em></th>
-            <th scope="col"><em>Einddatum</em></th>
-            <th scope="col"><em>Status</em></th>
-          </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Stephen Kwan</td>
-                <td>Spring Framework</td>
-                <td>01-01-2023</td>
-                <td>01-01-2023</td>
-                <td><button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button></td>
-            </tr>
-            <tr>
-              <th scope="row">1</th>
-              <td>Stephen Kwan</td>
-              <td>Spring Framework</td>
-              <td>01-01-2023</td>
-              <td>01-01-2023</td>
-              <td><button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button></td>
-          </tr>
-        </tbody>
-      </table>
 
-      <br>
+      <!-- Reserverings tabel -->
+      <h4>Reserveringen</h4>
+      <div class="container mt-5">
+        <table
+          class="table table-striped"
+          id="user-dashboard-reservation-table"
+        >
+          <thead>
+            <tr>
+              <th scope="col"><em>Boek Titel</em></th>
+              <th scope="col"><em>Reserverings Datum</em></th>
+              <th scope="col"><em>Status</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Geschiedenis tabel -->
+      <h4>Geschiedenis</h4>
+      <div class="container mt-5">
+        <table class="table table-striped" id="user-dashboard-history">
+          <thead>
+            <tr>
+              <th scope="col"><em>Boek Titel</em></th>
+              <th scope="col"><em>Startdatum</em></th>
+              <th scope="col"><em>Einddatum</em></th>
+              <th scope="col"><em>Status</em></th>
+              <th scope="col"><em>Review</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <br />
+
 
       <h4>Mijn reviews</h4>
-    <button type="button" class="btn btn-black btn-outline-secondary border rounded-pill fw-bold" id="reviews">Zie mijn reviews</button> 
+      <div id="reviewContainer"></div>
+        
+      </div>
 
     </div>
 
 
-    <script src="script.js" defer></script>
 
-    
+    <!-- Modal to write Review -->
+    <div
+      class="modal fade"
+      id="reviewModal"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="reviewModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- Modal header -->
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="reviewModalLabel">
+              Review Toevoegen
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              onclick="resetForm()"
+            ></button>
+          </div>
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div id="bookInfo"></div>
+
+            <!-- Star rating -->
+            <div id="rating" data-rating="0">
+              <span class="fa fa-star" data-star="1"></span>
+              <span class="fa fa-star" data-star="2"></span>
+              <span class="fa fa-star" data-star="3"></span>
+              <span class="fa fa-star" data-star="4"></span>
+              <span class="fa fa-star" data-star="5"></span>
+            </div>
+            <br />
+
+            <!-- Review text -->
+            <div class="mb-3">
+              <label for="reviewText" class="form-label">Review</label>
+              <textarea
+                class="form-control"
+                id="reviewText"
+                rows="3"
+                oninput="checkEmpty()"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Modal footer -->
+          <div id="footerButtons" class="modal-footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/script.js" defer></script>
+
+    <script> 
+      // Fetch borrowed books
+      window.onload = function() {
+      fetchBorrowedBooks();
+      fetchReservations();
+      
+      getReviews().then(data => {
+                    renderReviews(data);
+      })
+      };
+
+      // extra help functions
+      function formatDate(date) {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(date).toLocaleDateString(undefined, options);
+      }
+
+      // fetch from backend functions
+
+      function fetchReservations() {
+        fetch("http://localhost:8080/user/current-reservations", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            renderReservations(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching reservations:", error);
+          });
+      }
+
+      function renderReservations(reservations) {
+        const tableBody = document.querySelector(
+          "#user-dashboard-reservation-table tbody"
+        );
+        tableBody.innerHTML = ""; // Clear current rows
+
+        // Sort the reservations, approved reservations first, pending reservations later
+        reservations.sort((a, b) => {
+          // If both a and b have the same approval status, return 0 (no change in order)
+          if (a.approved === b.approved) return 0;
+
+          // If a is approved and b is not, place a before b (return -1)
+          if (a.approved && !b.approved) return -1;
+
+          // If b is approved and a is not, place b before a (return 1)
+          return 1;
+        });
+
+        reservations.forEach((reservation, index) => {
+          const row = tableBody.insertRow();
+
+          const cellBookTitle = row.insertCell(0);
+          cellBookTitle.textContent = reservation.bookTitle;
+
+          const cellReservationDate = row.insertCell(1);
+          cellReservationDate.textContent = formatDate(
+            reservation.reservationDate
+          );
+
+          const cellStatus = row.insertCell(2);
+          if (reservation.approved) {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Reservering Goedgekeurd</button>';
+          } else {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">In afwachting</button>';
+          }
+        });
+      }
+
+      function fetchBorrowedBooks() {
+        fetch("http://localhost:8080/user/borrowed-books-list", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            renderBorrowedBooks(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching borrowed books:", error);
+          });
+      }
+
+      function renderBorrowedBooks(books) {
+        const tableBody = document.querySelector(
+          "#user-dashboard-history tbody"
+        );
+        tableBody.innerHTML = ""; // Clear current rows
+
+        // Sort the books: current books first, returned books later
+        books.sort((a, b) => {
+          if (a.returnedDate === null && b.returnedDate !== null) return -1;
+          if (a.returnedDate !== null && b.returnedDate === null) return 1;
+          return 0; // Both are either current or returned
+        });
+
+        books.forEach((book, index) => {
+          const row = tableBody.insertRow();
+
+          const cellBookTitle = row.insertCell(0);
+          cellBookTitle.textContent = book.bookTitle;
+
+          const cellStartDate = row.insertCell(1);
+          cellStartDate.textContent = formatDate(book.borrowDate);
+
+          const cellEndDate = row.insertCell(2);
+          cellEndDate.textContent = book.returnedDate
+            ? formatDate(book.returnedDate)
+            : "-";
+
+          const cellStatus = row.insertCell(3);
+          if (book.returnedDate) {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-icegrey noHover btn-outline-secondary border rounded-pill fw-bold">Lening voltooid</button>';
+          } else {
+            cellStatus.innerHTML =
+              '<button type="button" class="btn btn-greyscale noHover btn-outline-secondary border rounded-pill fw-bold">Loopt binnenkort af</button>';
+          }
+
+          // Inserting the new button cell
+          const cellButton = row.insertCell(4);
+          if (book.returnedDate) {
+            // only show a review button when you have already handed in the book
+            cellButton.innerHTML = `<button onclick="fetchBookInfo(${book.bookCopyId})" type="button" class="wt-btn border rounded-pill text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>`;
+          }
+        });
+      }
+
+      /////////// FOR THE REVIEW BUTTONS ///////////
+
+      // Check if user clicked a star to enable the save button
+      var starElements = document.querySelectorAll("#rating [data-star]");
+
+      starElements.forEach(function (star) {
+        star.addEventListener("click", function () {
+          var starRating = star.getAttribute("data-star");
+          document
+            .getElementById("rating")
+            .setAttribute("data-rating", starRating);
+          checkEmpty();
+        });
+      });
+
+      // Check if user has written a review and clicked a star to enable the save button
+      function checkEmpty() {
+        let reviewText = document.getElementById("reviewText").value;
+        let rating = document
+          .getElementById("rating")
+          .getAttribute("data-rating");
+
+        let saveButton = document.getElementById("save-button");
+        saveButton.disabled = reviewText.length <= 0 || rating === "0";
+      }
+
+      // Function to reset the modal after closing it
+      function resetForm() {
+        // Clear the textarea content
+        document.getElementById("reviewText").value = "";
+
+        // Reset the star rating
+        document.getElementById("rating").setAttribute("data-rating", "0");
+        const stars = document.querySelectorAll(".fa");
+        stars.forEach((star) => {
+          star.style.color = "gray";
+        });
+      }
+
+      // Add a click event listener to each star icon
+      const stars = document.querySelectorAll(".fa");
+      stars.forEach((star) => {
+        star.addEventListener("click", () => {
+          const rating = parseInt(star.getAttribute("data-star"));
+          document.getElementById("rating").setAttribute("data-rating", rating);
+          highlightStars(rating);
+        });
+      });
+
+      // Highlight stars based on the selected rating
+      function highlightStars(rating) {
+        stars.forEach((star) => {
+          const starRating = parseInt(star.getAttribute("data-star"));
+          if (starRating <= rating) {
+            star.style.color = "orange";
+          } else {
+            star.style.color = "gray";
+          }
+        });
+      }
+
+      // Save review object in database
+      function opslaan(bookId) {
+        let reviewStars = document
+          .getElementById("rating")
+          .getAttribute("data-rating");
+        let reviewText = document.getElementById("reviewText").value;
+        let userId = localStorage.getItem("WT_ID");
+        console.log(userId);
+
+        let obj = {
+          stars: reviewStars,
+          text: reviewText,
+          bookId: bookId,
+          userId: userId,
+        };
+
+        fetch("http://localhost:8080/review/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(obj),
+        })
+          .then((response) => response.json())
+          .then((success) => {
+            if (success) {
+              alert("Review Opgeslagen");
+              location.reload();
+            } else {
+              alert("Er is iets mis gegaan.");
+            }
+          });
+      }
+
+      function getBookInfo(bookId) {
+        return fetch(`http://localhost:8080/book/info/${bookId}`).then(
+          (response) => {
+            return response.json();
+          }
+        );
+      }
+
+      // Fetch book information and update the modal content
+      function fetchBookInfo(bookId) {
+        getBookInfo(bookId).then((bookInfo) => {
+          let modal = document.getElementById("reviewModal");
+          let bookInfoSection = modal.querySelector("#bookInfo");
+          let saveButton = modal.querySelector("#footerButtons");
+
+          // Update the modal with book information
+          let authorName = bookInfo.author;
+          let title = bookInfo.title;
+          let coverUrl = bookInfo.coverUrl;
+          bookInfoSection.innerHTML = `<img src="${coverUrl}" width="200" height="300"><h2>${title}, ${authorName}</h2> <br><br>`;
+          saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetForm()">Sluiten</button>
+                                            <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`;
+        });
+      }
+
+      
+
+
+      ///////// For review table //////////
+       // Function to generate star icons
+
+      function generateStarIcons(num) {
+          if (typeof num !== 'number' || num < 0 || num > 5) {
+              return 'Invalid input';
+          }
+
+          let starsHTML = '';
+          for (let i = 1; i <= 5; i++) {
+              if (i <= num) {
+                  starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+              } else {
+                  starsHTML += '<i class="bi bi-star text-warning"></i>';
+              }
+          }
+          return starsHTML;
+      }
+
+      async function getReviews() {
+
+        let id = localStorage.getItem("WT_ID");
+        console.log("userid for review fetch " + id)
+
+          try {
+          const response = await fetch(`http://localhost:8080/review/user/${id}`, {
+          method: 'GET',
+          });
+          
+          //if it doesn't work throw error
+          if (!response.ok) {
+          throw new Error(`Error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data)
+          return data;
+          } catch (error) {
+              console.log(error);
+          }
+      }
+
+      function renderReviews(reviews){
+
+            let table = `
+            <table class="table table-striped" id="reviews">
+            <thead>
+                <tr>
+                    <th scope="col"><em>Boek</em></th>
+                    <th scope="col"><em>Sterren</em></th>
+                    <th scope="col"><em>Text</em></th>
+                </tr>
+            </thead>
+            <tbody>
+                    `;
+            
+            reviews.forEach(review => {
+              // const book = getBook(review.bookId)
+              // console.log(book)
+                table += `
+                <tr>
+                  <td>${review.bookTitle}</td>
+                  <td>${generateStarIcons(review.stars)}</td>
+                  <td>${review.text}</td>
+
+
+            `;});
+
+
+            table += '</table>';
+
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = table;
+        }
+
+    </script>
 
     <!-- dit is de bootstrap link-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

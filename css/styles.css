@@ -5,6 +5,9 @@
 
 body {
     font-family: "Euclid";
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .login-container {
@@ -71,6 +74,11 @@ body {
     align-items: center;
     background: #131313;
     text-align: center;
+    color: #00E600;
+}
+
+.fav-btn:hover{
+    color: #01a801 !important;
 }
 
 .bi-heart, 
@@ -88,6 +96,15 @@ body {
     font-size: large;
 }
 
+.wt-row{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.bk-pg-im{
+    max-width: 300px;
+    max-height: 350px;
+}
 
 .boek-toevoegen-btn{
     padding: 12px 20px;
@@ -103,6 +120,8 @@ body {
     align-items: center;
     background: #e20b0b;
     text-align: center;
+}
+    
 .btn-primary {
     color: #000 !important;
     background-color: #00E600 !important;
@@ -162,6 +181,10 @@ body {
     min-width: 150px;
     background-color: #fff;
     padding:10px;
+    margin-right: 20px;
+}
+
+.container-left{
     margin-right: 20px;
 }
 
@@ -237,4 +260,3 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Working talent library app</title>
@@ -64,7 +64,7 @@
   <body>
     <div class="login-container">
       <img
-        src="https://cdn.thalia.nu/public/thumbnails/partners/logos/WT-Basislogo-RGB_2_medium.png?Key-Pair-Id=K1299LB00EJZ7R"
+        src="images/wt_logo.png"
         class="login-margins"
       />
       <div class="row align-items-center">
@@ -101,9 +101,20 @@
               Login
             </button>
           </form>
+          <!-- <a href="" target="_self">Wachtwoord vergeten</a> -->
+          <p>Heb je nog geen account? <a href="registration.html" target="_self">Meldt u hier aan.</a></p>
+          
         </div>
       </div>
     </div>
+    <script>
+      async function addFooter() {
+        const resp = await fetch("footer.html");
+        const html = await resp.text();
+        document.body.insertAdjacentHTML("beforeend", html);
+      }   
+      addFooter()
+    </script>
 
     <!-- dit is de bootstrap link-->
     <script
