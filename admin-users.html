@@ -22,28 +22,27 @@
   </head>
   <body>
     <div id="content" style="display: none">
-    <!-- TABLE USERS -->
+      <!-- TABLE USERS -->
 
       <h4>Alle Gebruikers</h4>
 
       <div class="container mt-5">
         <table class="table table-striped" id="user-table">
-            <thead>
-                <tr>
-                    <th scope="col"><em>Gebruikers ID</em></th>
-                    <th scope="col"><em>Voornaam</em></th>
-                    <th scope="col"><em>Achternaam</em></th>
-                    <th scope="col"><em>Email</em></th>
-                    <!-- <th scope="col"><em>Registratie Datum</em></th> -->
-                    <th scope="col"><em>Verwijderen</em></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be inserted here dynamically -->
-            </tbody>
+          <thead>
+            <tr>
+              <th scope="col"><em>Gebruikers ID</em></th>
+              <th scope="col"><em>Voornaam</em></th>
+              <th scope="col"><em>Achternaam</em></th>
+              <th scope="col"><em>Email</em></th>
+              <!-- <th scope="col"><em>Registratie Datum</em></th> -->
+              <th scope="col"><em>Verwijderen</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be inserted here dynamically -->
+          </tbody>
         </table>
-    </div>
-
+      </div>
     </div>
 
     <div id="access-denied-message" style="display: none">
@@ -51,110 +50,238 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Fetch users with role 'user' when the page loads
-            fetchUsersByRole('user');
-        });
+      // Call loadTokens on page load
+      window.onload = loadTokens();
 
-        function authenticate(){
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch(`http://localhost:8080/authenticate/admin`, {
-                  method: "POST",
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                  userId: localStorage.getItem("WT_ID"),
-                  role: localStorage.getItem("WT_ROLE"),
-                  token: localStorage.getItem("WT_TOKEN")
-                  })
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                    if (data) {
-                        document.getElementById('content').style.display = 'block';
-                    } else {
-                        document.getElementById('access-denied-message').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
+      // Function to load all tokens on page load
+      function loadTokens() {
+        // Call your backend API to get all tokens
+        fetch("http://localhost:8080/invitation-token/getAllUnusedTokens")
+          .then((response) => response.json())
+          .then((data) => {
+            // Clear the existing rows in the table before adding new ones
+            var table = document
+              .getElementById("token-table")
+              .getElementsByTagName("tbody")[0];
+            table.innerHTML = ""; // Clear existing rows
 
-    }
-
-        function formatDate(date) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options);
-        }
-
-        function deleteUserByAdmin(userId) {
-            // Ask for confirmation
-            let confirmation = window.confirm("Weet u zeker dat u de gebruiker wil verwijderen?");
-
-            if (!confirmation) {
-                return; // If the admin cancels the confirmation, just return and don't proceed with the deletion.
-            }
-
-          
-            fetch(`http://localhost:8080/user/${userId}`, {
-                method: 'DELETE',
-                Authorization: localStorage.getItem("WT_TOKEN"),
-            })
-                .then(response => {
-                    if (response.ok) {
-                        // Refresh the user table
-                        fetchUsersByRole('user');
-                    } else {
-                        console.error('Error deleting user');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting user:', error);
-                });
-        }
-
-        function fetchUsersByRole(role) {
-            fetch(`http://localhost:8080/user/role/${role}`)
-                .then(response => response.json())
-                .then(users => {
-                    populateUserTable(users);
-                })
-                .catch(error => {
-                    console.error('Error fetching users:', error);
-                });
-        }
-
-        function populateUserTable(users) {
-            const tableBody = document.getElementById('user-table').getElementsByTagName('tbody')[0];
-
-            // Clear any existing rows
-            tableBody.innerHTML = '';
-
-            // Insert each user into the table
-            users.forEach(user => {
-                const row = tableBody.insertRow();
-
-                // Assuming the API returns an id, firstName, lastName, email, and registrationDate for each user
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                const cell3 = row.insertCell(2);
-                const cell4 = row.insertCell(3);
-                const cell5 = row.insertCell(4);
-                //const cell6 = row.insertCell(5);
-
-                cell1.innerHTML = user.id;
-                cell2.innerHTML = user.firstName;
-                cell3.innerHTML = user.lastName;
-                cell4.innerHTML = user.email;
-                //cell5.innerHTML = 'nog veranderen in de DTO' //formatDate(user.registrationDate); // Ensure this date is formatted properly
-                cell5.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
+            data.forEach((tokenData) => {
+              addTokenToTable(
+                tokenData.token,
+                tokenData.role,
+                tokenData.expirationDate
+              );
             });
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Function to generate a token based on the selected role
+      function generateTokenFromSelection() {
+        var role = document.getElementById("roleSelector").value;
+        // Call your backend API to generate a token
+        // This is a placeholder; you'll replace it with your actual API call
+        fetch("http://localhost:8080/invitation-token/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ role: role }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Add the new token to the table
+            addTokenToTable(data.token, role, data.expirationDate);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Function to add a token to the table
+      function addTokenToTable(token, role, expirationDate) {
+        var table = document
+          .getElementById("token-table")
+          .getElementsByTagName("tbody")[0];
+        var newRow = table.insertRow(table.rows.length);
+
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
+        var cell3 = newRow.insertCell(2);
+        var cell4 = newRow.insertCell(3);
+        var cell5 = newRow.insertCell(4);
+
+        cell1.innerHTML = token;
+        cell2.innerHTML = role;
+        cell3.innerHTML = expirationDate;
+        cell4.innerHTML =
+          '<button class="btn btn-primary" onclick="copyTokenToClipboard(\'' +
+          token +
+          "')\">Token Kopiëren</button>";
+        cell5.innerHTML =
+          '<button class="btn btn-danger" onclick="deleteToken(\'' +
+          token +
+          "')\">Delete</button>";
+      }
+
+      // Function to copy token to clipboard
+      function copyTokenToClipboard(token) {
+        navigator.clipboard
+          .writeText(token)
+          .then(() => {
+            // Display a message to the user indicating that the token has been copied.
+            alert("Token copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Could not copy text: ", err);
+          });
+      }
+
+      // Function to delete a token
+      function deleteToken(token) {
+        // Ask for confirmation
+        let confirmation = window.confirm(
+          "Are you sure you want to delete this token?"
+        );
+
+        if (!confirmation) {
+          return; // If the user cancels the confirmation, just return and don't proceed with the deletion.
         }
+
+        // Call your backend API to delete the token
+        // This is a placeholder; you'll replace it with your actual API call
+        fetch("http://localhost:8080/invitation-token/delete/" + token, {
+          method: "DELETE",
+          headers: {
+            Authorization: localStorage.getItem("WT_TOKEN"), // Assuming you're using token-based authentication
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Remove the token from the table or refresh the table
+              loadTokens();
+            } else {
+              console.error("Error deleting token");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Fetch users with role 'user' when the page loads
+        fetchUsersByRole("user");
+      });
+
+      function authenticate() {
+        document.addEventListener("DOMContentLoaded", function () {
+          fetch(`http://localhost:8080/authenticate/admin`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: localStorage.getItem("WT_ID"),
+              role: localStorage.getItem("WT_ROLE"),
+              token: localStorage.getItem("WT_TOKEN"),
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              if (data) {
+                document.getElementById("content").style.display = "block";
+              } else {
+                document.getElementById("access-denied-message").style.display =
+                  "block";
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+      }
+
+      function formatDate(date) {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(date).toLocaleDateString(undefined, options);
+      }
+
+      function deleteUserByAdmin(userId) {
+        // Ask for confirmation
+        let confirmation = window.confirm(
+          "Weet u zeker dat u de gebruiker wil verwijderen?"
+        );
+
+        if (!confirmation) {
+          return; // If the admin cancels the confirmation, just return and don't proceed with the deletion.
+        }
+
+        fetch(`http://localhost:8080/user/${userId}`, {
+          method: "DELETE",
+          Authorization: localStorage.getItem("WT_TOKEN"),
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Refresh the user table
+              fetchUsersByRole("user");
+            } else {
+              console.error("Error deleting user");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting user:", error);
+          });
+      }
+
+      function fetchUsersByRole(role) {
+        fetch(`http://localhost:8080/user/role/${role}`)
+          .then((response) => response.json())
+          .then((users) => {
+            populateUserTable(users);
+          })
+          .catch((error) => {
+            console.error("Error fetching users:", error);
+          });
+      }
+
+      function populateUserTable(users) {
+        const tableBody = document
+          .getElementById("user-table")
+          .getElementsByTagName("tbody")[0];
+
+        // Clear any existing rows
+        tableBody.innerHTML = "";
+
+        // Insert each user into the table
+        users.forEach((user) => {
+          const row = tableBody.insertRow();
+
+          // Assuming the API returns an id, firstName, lastName, email, and registrationDate for each user
+          const cell1 = row.insertCell(0);
+          const cell2 = row.insertCell(1);
+          const cell3 = row.insertCell(2);
+          const cell4 = row.insertCell(3);
+          const cell5 = row.insertCell(4);
+          //const cell6 = row.insertCell(5);
+
+          cell1.innerHTML = user.id;
+          cell2.innerHTML = user.firstName;
+          cell3.innerHTML = user.lastName;
+          cell4.innerHTML = user.email;
+          //cell5.innerHTML = 'nog veranderen in de DTO' //formatDate(user.registrationDate); // Ensure this date is formatted properly
+          cell5.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
+        });
+      }
     </script>
     <script src="js/script.js" defer></script>
-   <script>authenticate()</script>
+    <script>
+      authenticate();
+    </script>
   </body>
 </html>

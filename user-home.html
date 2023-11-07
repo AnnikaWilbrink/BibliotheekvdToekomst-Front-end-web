@@ -287,7 +287,7 @@
           const cellButton = row.insertCell(4);
           if (book.returnedDate) {
             // only show a review button when you have already handed in the book
-            cellButton.innerHTML = `<button onclick="fetchBookInfo(${book.bookCopyId})" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>`;
+            cellButton.innerHTML = `<button onclick="fetchBookInfo(${book.bookCopyId})" type="button" class="wt-btn border rounded-pill text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#reviewModal">Review Toevoegen</button>`;
           }
         });
       }
