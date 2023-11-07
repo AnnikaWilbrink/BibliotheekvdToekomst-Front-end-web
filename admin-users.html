@@ -19,9 +19,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
       rel="stylesheet"
     />
+    <script src="js/script.js"></script>
   </head>
   <body>
-    <div id="content" style="display: none">
+    <div id="content">
       <!-- TABLE USERS -->
 
       <h4>Alle Gebruikers</h4>
@@ -43,10 +44,6 @@
           </tbody>
         </table>
       </div>
-    </div>
-
-    <div id="access-denied-message" style="display: none">
-      <p>Access Denied</p>
     </div>
 
     <script>
@@ -178,33 +175,8 @@
         fetchUsersByRole("user");
       });
 
-      function authenticate() {
-        document.addEventListener("DOMContentLoaded", function () {
-          fetch(`http://localhost:8080/authenticate/admin`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: localStorage.getItem("WT_ID"),
-              role: localStorage.getItem("WT_ROLE"),
-              token: localStorage.getItem("WT_TOKEN"),
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              if (data) {
-                document.getElementById("content").style.display = "block";
-              } else {
-                document.getElementById("access-denied-message").style.display =
-                  "block";
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-            });
-        });
+      if (!isAdmin()) {
+        window.location.href = '/index.html';
       }
 
       function formatDate(date) {
@@ -278,10 +250,6 @@
           cell5.innerHTML = `<button class="btn btn-danger" onclick="deleteUserByAdmin(${user.id})">Verwijderen</button>`;
         });
       }
-    </script>
-    <script src="js/script.js" defer></script>
-    <script>
-      authenticate();
     </script>
   </body>
 </html>
