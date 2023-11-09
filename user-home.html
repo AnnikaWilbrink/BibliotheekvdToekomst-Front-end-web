@@ -361,6 +361,8 @@
           userId: userId,
         };
 
+        console.log(obj)
+
         fetch("http://localhost:8080/review/save", {
           method: "POST",
           headers: {
@@ -379,30 +381,30 @@
             }
           });
 
-        updateAvgRating(bookId)
+        // updateAvgRating(bookId)
       }
 
-      async function updateAvgRating(bookId){
-        try {
-          const response = await fetch(
-            `http://localhost:8080/book/average/rating/${bookId}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": localStorage.getItem("WT_TOKEN"),
-              }
-            });
-          if (!response.ok) {
-            throw new Error(`Error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          location.reload();
-          alert("Average rating geupdate!")
-          return data;
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      // async function updateAvgRating(bookId){
+      //   try {
+      //     const response = await fetch(
+      //       `http://localhost:8080/book/average/rating/${bookId}`, {
+      //         method: "PUT",
+      //         headers: {
+      //           "Content-Type": "application/json",
+      //           "Authorization": localStorage.getItem("WT_TOKEN"),
+      //         }
+      //       });
+      //     if (!response.ok) {
+      //       throw new Error(`Error! status: ${response.status}`);
+      //     }
+      //     const data = await response.json();
+      //     location.reload();
+      //     alert("Average rating geupdate!")
+      //     return data;
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      // }
 
       async function archiveBook(id) {
         try {
@@ -427,6 +429,7 @@
       }
 
       function getBookInfo(bookId) {
+        console.log(bookId)
         return fetch(`http://localhost:8080/book/info/${bookId}`).then(
           (response) => {
             return response.json();
@@ -447,7 +450,7 @@
           let coverUrl = bookInfo.coverUrl;
           bookInfoSection.innerHTML = `<img src="${coverUrl}" width="200" height="300"><h2>${title}, ${authorName}</h2> <br><br>`;
           saveButton.innerHTML = `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetForm()">Sluiten</button>
-                                            <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookId})" disabled>Opslaan</button>`;
+                                            <button id="save-button" type="button" class="btn btn-primary" onclick="opslaan(${bookInfo.id})" disabled>Opslaan</button>`;
         });
       }
 
