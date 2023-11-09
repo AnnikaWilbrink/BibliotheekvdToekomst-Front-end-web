@@ -386,6 +386,52 @@
               alert("Er is iets mis gegaan.");
             }
           });
+
+        updateAvgRating(bookId)
+      }
+
+      async function updateAvgRating(bookId){
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/average/rating/${bookId}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Average rating geupdate!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      async function archiveBook(id) {
+        try {
+          const response = await fetch(
+            `http://localhost:8080/book/archive/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("WT_TOKEN"),
+              }
+            });
+          if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          location.reload();
+          alert("Boek gearchiveerd!")
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       function getBookInfo(bookId) {

@@ -23,9 +23,9 @@
             <!-- Subject -->
             <p class=" border-bottom"><strong>Onderwerp</strong></p>
 
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="tiny" id="subject-tiny" /> Programmeren</label><br>
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="small" id="subject-small" /> Scrum</label><br>
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="medium" id="subject-medium" /> Databases</label><br> 
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="Programmeren" id="subject-tiny" /> Programmeren</label><br>
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="Scrum" id="subject-small" /> Scrum</label><br>
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-sub" value="Databases" id="subject-medium" /> Databases</label><br> 
             
             <!-- Type book -->
             <p class=" border-bottom"><strong>Boek, e-boek of luisterboek?</strong></p>
@@ -35,11 +35,10 @@
             <label><input class="form-check-input me-1" type="checkbox" name="bk-cat" value="Luisterboek" id="book-type-listenbook" /> Luisterboek</label><br>                     
 
             <!-- Beschikbaarheid -->
-            <p class=" border-bottom"><strong>Beschikbaarheid</strong></p>
+            <!-- <p class=" border-bottom"><strong>Beschikbaarheid</strong></p>
 
             <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="tiny" id="availablility-available" /> Beschikbaar</label><br>
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="small" id="availablility-reservered" /> Gereserveerd</label><br>
-            <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="medium" id="availablility-borrowed" /> Uitgeleend</label><br> 
+            <label><input class="form-check-input me-1" type="checkbox" name="bk-stat" value="small" id="availablility-not-available" /> Niet beschikbaar</label><br> -->
 
             <!-- Stars -->
             <p class=" border-bottom"><strong>Minimale beoordeling</strong></p>
@@ -82,10 +81,11 @@
           </div>
           <div class="col col-lg-2 mx-auto">
             <select class="form-select" id="sortDropdown">
-              <option value="title_asc" selected>Title (A-Z)</option>
+              <option value="title_asc">Title (A-Z)</option>
               <option value="title_desc">Title (Z-A)</option>
               <option value="review-rating_asc">Rating (Low to High)</option>
               <option value="review-rating_desc">Rating (High to Low)</option>
+              
           </select>
           </div>
         </div>
@@ -197,75 +197,29 @@
           return sum; // Skip invalid stars
           }, 0);
         
-        const averageRating = totalStars / reviews.length;
+        const averageRating = Math.round((totalStars / reviews.length) * 10 ** 2) / 10 ** 2;
+
         console.log(averageRating)
         return isNaN(averageRating) ? 0 : averageRating; // Handle NaN case
       }
 
 
 
-      // function generateStarIcons(num) {
-      //           if (typeof num !== 'number' || num < 0 || num > 5) {
-      //               return 'Invalid input';
-      //           }
+      function generateStarIcons(num) {
+                if (typeof num !== 'number' || num < 0 || num > 5) {
+                    return 'Invalid input';
+                }
 
-      //           let starsHTML = '';
-      //           for (let i = 1; i <= 5; i++) {
-      //               if (i <= num) {
-      //                   starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
-      //               } else {
-      //                   starsHTML += '<i class="bi bi-star text-warning"></i>';
-      //               }
-      //           }
-      //           return starsHTML;
-      //       }
-
-    //   function generateStarIcons(num) {
-    //     if (typeof num !== 'number' || num < 0 || num > 5) {
-    //         return 'Invalid input';
-    //     }
-
-    //     const fullStars = Math.floor(num);
-    //     const halfStar = num - fullStars > 0.5;
-
-    //     let starsHTML = '';
-    //     for (let i = 1; i <= 5; i++) {
-    //         if (i <= fullStars) {
-    //             starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
-    //         } else if (halfStar && i - fullStars === 0.5) {
-    //             starsHTML += '<i class="bi bi-star-half text-warning"></i>';
-    //         } else {
-    //             starsHTML += '<i class="bi bi-star text-warning"></i>';
-    //         }
-    //     }
-
-    //     return starsHTML;
-    // }
-
-
-    function generateStarIcons(num) {
-    if (typeof num !== 'number' || num < 0 || num > 5) {
-        return 'Invalid input';
-    }
-
-    const fullStar = '<i class="bi bi-star-fill text-warning"></i>';
-    const halfStar = '<i class="bi bi-star-half text-warning"></i>';
-    const emptyStar = '<i class="bi bi-star text-warning"></i>';
-
-    let starsHTML = '';
-    for (let i = 1; i <= 5; i++) {
-        if (i <= num - 0.5) {
-            starsHTML += fullStar;
-        } else if (i > num - 0.5 && i <= num) {
-            starsHTML += halfStar;
-        } else {
-            starsHTML += emptyStar;
-        }
-    }
-
-    return starsHTML + " ("+num+")";
-}
-
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= num) {
+                        starsHTML += '<i class="bi bi-star-fill text-warning"></i>';
+                    } else {
+                        starsHTML += '<i class="bi bi-star text-warning"></i>';
+                    }
+                }
+                return starsHTML + " ("+num+")";
+            }
 
 
       // fetch all book from the database
@@ -341,10 +295,28 @@
           searchDto.filterWord = searchInput;
         }
 
+        // 2 -> subject
+        let subjectCheckboxes = document.querySelectorAll('input[name="bk-sub"]:checked');
+        let selectedSubjects = [];
+
+        subjectCheckboxes.forEach(checkbox => {
+          selectedSubjects.push(checkbox.value);
+        });
+
+        if (selectedSubjects.length > 0) {
+            searchDto.subject = selectedSubjects;
+        }
+
         // 3 -> Category
-        let isCategory = document.querySelector('input[name="bk-cat"]:checked')?.value;
-        if (!!isCategory) {
-          searchDto.isCategory = parseInt(isCategory);
+        let categoryCheckboxes = document.querySelectorAll('input[name="bk-cat"]:checked');
+        let selectedCategories = [];
+
+        categoryCheckboxes.forEach(checkbox => {
+            selectedCategories.push(checkbox.value);
+        });
+
+        if (selectedCategories.length > 0) {
+            searchDto.categories = selectedCategories;
         }
 
         // 6 - Rating
@@ -386,7 +358,13 @@
 
           const data = await response.json();
           console.log(data)
+
+          let bookids = [];
           renderBooks(data);
+          data.forEach(book => {
+                  bookids.push(book.id);
+              });
+              findAllFavs(bookids);
 
         } catch (error) {
           console.log(error);
