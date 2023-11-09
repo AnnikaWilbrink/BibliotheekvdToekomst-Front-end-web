@@ -83,3 +83,17 @@ async function addNav() {
         
 }
 addNav()
+
+function hasRole(role) {
+    let loggedInRole = localStorage.getItem('WT_ROLE');
+    
+    return !!loggedInRole && loggedInRole == role;
+}
+
+function isAdmin() {
+    return hasRole('admin');
+}
+
+function isFrontdesk() {
+    return hasRole('front-desk');
+}

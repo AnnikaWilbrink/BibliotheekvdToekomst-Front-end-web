@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>De Bibliotheek Van De Toekomst</title>
-    
-    <!-- dit is de bootstrap link-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> 
+    <script src="js/script.js"></script>
+
     <style>
       .row{
         width: 27em;
@@ -16,25 +21,24 @@
       input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
-      }
-
-      .custom-button[disabled] {
-        background-color: #eca3a9; /* Change the background color to a light red */
-        cursor: not-allowed;
+      }     
+      
+      td{
+        vertical-align: middle;
       }
     </style>
   </head>
 
   <body onload=loadAll(id)>
-    <div id="content" style="display: none">
+    <div id="content">
       <div class="container">
 
         <div class="container">
           <div class="row">
             <div class="col input-group">
-              <button type="button" class="btn btn-outline-secondary" id="decrement">-</button>
+              <button type="button" class="btn btn-outline-secondary" id="decrement" onclick="decrease()">-</button>
               <input type="number" class="form-control text-center" id="number" min="1" max="20" value="1">
-              <button type="button" class="btn btn-outline-secondary" id="increment">+</button>
+              <button type="button" class="btn btn-outline-secondary" id="increment" onclick="increase()">+</button>
             </div>
             <div class="col">
               <button class="btn btn-primary btn-outline-secondary border rounded-pill text-dark fw-bold" type="button" onclick="createBookCopy()">Exemplaar toevoegen</button>
@@ -48,59 +52,49 @@
         <div class="container" id="archivedContainer"></div>
       </div>
     </div>
-    
+
+    <div class="modal fade" id="archiveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                  <h4 class="modal-title" id="archiveModalTitle"></h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div id="modal-body" class="modal-body">
+                <p>Geef een beschrijving op voor het archiveren van dit boekexemplaar:</p>
+                <textarea id="archiveDescription" class="form-control" oninput="checkEmpty()"></textarea>
+              </div>
+
+              <div id="footer-button" class="modal-footer"></div>
+
+          </div>
+      </div>
+    </div>
 
     <script>
       id = parseInt(localStorage.getItem('WT_book'));
       console.log("id="+id)
 
-      document.addEventListener('DOMContentLoaded', function () {
+      if (!isAdmin()) {
+        window.location.href = '/index.html';
+      }
+
+      function increase() {
         const numberInput = document.getElementById('number');
-        const incrementButton = document.getElementById('increment');
-        const decrementButton = document.getElementById('decrement');
+        let currentValue = parseInt(numberInput.value);
+        if (currentValue < 20) {
+          numberInput.value = currentValue + 1;
+        }
+      }
 
-        incrementButton.addEventListener('click', function () {
-          let currentValue = parseInt(numberInput.value);
-          if (currentValue < 20) {
-            numberInput.value = currentValue + 1;
-          }
-        });
-
-        decrementButton.addEventListener('click', function () {
-          let currentValue = parseInt(numberInput.value);
-          if (currentValue > 1) {
-            numberInput.value = currentValue - 1;
-          }
-        });
-      });
-
-      function authenticate(){
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch(`http://localhost:8080/authenticate/admin`, {
-                  method: "POST",
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                  userId: localStorage.getItem("WT_ID"),
-                  role: localStorage.getItem("WT_ROLE"),
-                  token: localStorage.getItem("WT_TOKEN")
-                  })
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                    if (data) {
-                        document.getElementById('content').style.display = 'block';
-                    } else {
-                        document.getElementById('access-denied-message').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
-
+      function decrease() {
+        const numberInput = document.getElementById('number');
+        let currentValue = parseInt(numberInput.value);
+        if (currentValue > 1) {
+          numberInput.value = currentValue - 1;
+        }
       }
 
       function loadAll(id){         
@@ -112,6 +106,18 @@
           console.log("boekcopy data=" + data)
           renderCopies(data)
         });
+      }
+
+      function checkEmpty() {
+        let archiveDescription = document.getElementById("archiveDescription").value;
+
+        let saveButton = document.getElementById("save-button");
+        saveButton.disabled = archiveDescription.length <= 0;
+      }
+
+      function createModal(copyId) {
+        document.getElementById('archiveModalTitle').innerHTML = `Archiveer boekexemplaar ${copyId}`;
+        document.getElementById("footer-button").innerHTML = `<button id="save-button" type="button" class="btn btn-danger border rounded-pill fw-bold" onclick="archiveBookCopy(${copyId})" disabled>Archiveer</button>`;
       }
 
       async function getBook(id) {
@@ -173,6 +179,7 @@
                   <th>Exemplaarnummer</th>
                   <th>Beschikbaar</th>
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -185,10 +192,10 @@
           } else {
             availability = "Niet beschikbaar";
           }
-          
+          console.log("DATA: "+ copy.archiveDescription)
 
           if (copy.archived == 0) {
-            console.log("DATA: "+ copy.archived)
+            
             table += `
               <tr data-id="${copy.id}">  
                 <td>${copy.copyNumber}</td>
@@ -197,15 +204,15 @@
                   
             `
             if (copy.available == 1) {
-              table += `<button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})">
-                    Archiveren
-                  </button>
+              table += `
+                  <button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold" id="archiveren_${copy.id}" data-bs-toggle="modal" data-bs-target="#archiveModal" onclick="createModal(${copy.id})">Archiveren</button>
                 </td>
               </tr>`
             } else {
-              table += `<button type="button" class="btn btn-danger btn-outline-secondary border rounded-pill fw-bold custom-button" id="archiveren_${copy.id}" onclick="archiveBookCopy(${copy.id})" disabled>
-                    Archiveren
-                  </button>
+              table += `
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Dit exemplaar is uitgeleend">
+                    <button type="button" class="btn btn-danger border rounded-pill fw-bold" id="archiveren_${copy.id}" disabled>Archiveren</button>
+                  </span>
                 </td>
               </tr>`
             }
@@ -220,6 +227,7 @@
                     Dearchiveren
                   </button>
                 </td>
+                <td><i class="fa-solid fa-circle-info fa-lg" rel="tooltip" title="${copy.archivedDescription}"></i></td>
               </tr>
             `
           }
@@ -233,13 +241,18 @@
 
         document.getElementById('booksContainer').innerHTML = table+endtable;
         document.getElementById('archivedContainer').innerHTML = tableArchived+endtable;
+
+        $(function () {
+          $('[data-bs-toggle="tooltip"]').tooltip()
+        })
+
+        $(document).ready(function(){
+          $("[rel=tooltip]").tooltip({ placement: 'right'});
+        });
       }
 
       async function createBookCopy() {
         let numberInput = document.getElementById("number").value;
-        // getHighestBookNumber().then(number => {
-        //     console.log("boekNumber=" + number)
-        // });
         for (let i=1; i<= numberInput; i++){
           let obj = {
           "available": true,
@@ -272,6 +285,8 @@
       }
 
       async function archiveBookCopy(id) {
+        archiveDescription = document.getElementById('archiveDescription').value;
+        console.log(archiveDescription)
         try {
           const response = await fetch(
             `http://localhost:8080/bookcopy/archive/${id}`, {
@@ -279,14 +294,15 @@
               headers: {
                 "Content-Type": "application/json",
                 "Authorization": localStorage.getItem("WT_TOKEN"),
-              }
+              },
+              body: JSON.stringify({"archivedDescription": archiveDescription}),
             });
           if (!response.ok) {
             throw new Error(`Error! status: ${response.status}`);
           }
           const data = await response.json();
           location.reload();
-          alert("Boek exemplaar gearchiveerd!")
+          // alert("Boek exemplaar gearchiveerd!")
           return data;
         } catch (error) {
           console.log(error);
@@ -316,17 +332,10 @@
       }
 
       
-      
-
     </script>
+    
 
-    <script src="js/script.js" defer></script>
-    <!-- dit is de bootstrap link-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </div>
-  <div id="access-denied-message" style="display: none">
-    <p>Access Denied</p>
-  </div>
-  <script>authenticate()</script>
+
   </body>
 </html>

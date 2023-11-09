@@ -1,44 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" type="text/css" href="css/styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
-    <!-- dit is de bootstrap link-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  
+    <title>De Bibliotheek Van De Toekomst</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"  rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> 
+    <script src="js/script.js"></script>
   
+    
+
   <script>
 
-    function authenticate(){
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch(`http://localhost:8080/authenticate/admin`, {
-                  method: "POST",
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                  userId: localStorage.getItem("WT_ID"),
-                  role: localStorage.getItem("WT_ROLE"),
-                  token: localStorage.getItem("WT_TOKEN")
-                  })
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                    if (data) {
-                        document.getElementById('content').style.display = 'block';
-                    } else {
-                        document.getElementById('access-denied-message').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
-
+    if (!isAdmin()) {
+      window.location.href = '/index.html';
     }
 
     async function updateReservationStatus(reservation){
@@ -492,11 +472,10 @@
   <body>
     
     <script>
-      authenticate()
       getReservations()
       buildBorrowedBooksTable()
     </script>
-    <div id="content" style="display: none">
+    <div id="content">
     <div class="dashboard-container">
       <h1>Admin dashboard</h1>
       <h4>Reserveringsverzoeken</h4>
@@ -612,18 +591,5 @@
     </div>
  </div>
 
-  <div id="access-denied-message" style="display: none">
-    <p>Access Denied</p>
-  </div>
-    
-    
-    <script src="js/script.js" defer></script>
-
-    <!-- dit is de bootstrap link-->
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
-    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
   </body>
 </html>
