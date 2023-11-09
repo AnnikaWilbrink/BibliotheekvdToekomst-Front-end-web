@@ -352,7 +352,6 @@
           .getAttribute("data-rating");
         let reviewText = document.getElementById("reviewText").value;
         let userId = localStorage.getItem("WT_ID");
-        console.log(userId);
 
         let obj = {
           stars: reviewStars,
@@ -397,7 +396,7 @@
           }
           const data = await response.json();
           location.reload();
-          alert("Average rating geupdate!")
+          // alert("Average rating geupdate!")
           return data;
         } catch (error) {
           console.log(error);
