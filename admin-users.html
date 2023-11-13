@@ -35,6 +35,7 @@
             <select id="roleSelector" class="form-select">
               <option value="admin">Admin</option>
               <option value="user">User</option>
+              <option value="front-desk">Front Desk</option>
             </select>
             <button
               onclick="generateTokenFromSelection()"
@@ -222,7 +223,7 @@
         return new Date(date).toLocaleDateString(undefined, options);
       }
 
-      function deleteUserByAdmin(userId) {
+      function deleteUserByAdmin(id) {
         // Ask for confirmation
         let confirmation = window.confirm(
           "Weet u zeker dat u de gebruiker wil verwijderen?"
@@ -232,7 +233,7 @@
           return; // If the admin cancels the confirmation, just return and don't proceed with the deletion.
         }
 
-        fetch(`http://localhost:8080/user/${userId}`, {
+        fetch(`http://localhost:8080/user/delete/${id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
