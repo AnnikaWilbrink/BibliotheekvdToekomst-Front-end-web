@@ -11,9 +11,10 @@
     <script src="js/script.js"></script>
   </head>
   <body>
-
     <div id="content">
-     <!--BUTTONS uitrollende tabel van persoongegevens-->
+
+    <!--BUTTONS uitrollende tabel van persoongegevens-->
+
     <button id="changePasswordButton" type="button" class="btn btn-secondary" onclick="toggleForm('changePasswordForm')">
       Verander Wachtwoord
     </button>
@@ -26,12 +27,16 @@
       Verander Telefoon Nummer
     </button>
 
+    <button id="deleteUserButton" type="button" class="btn btn-danger" onclick="toggleForm('deleteUserForm')">
+      Verwijder Mijn Account
+    </button>
+
     <!-- Verander Wachtwoord -->
 
     <form id="changePasswordForm" class="container" style="display: none">
       <div class="mb-3">
         <label for="current-password" class="form-label"
-          >Huigdig Wachtwoord</label
+          >Huidig Wachtwoord</label
         >
         <input type="password" class="form-control" id="current-password" />
       </div>
@@ -90,9 +95,24 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    <script>
+    <!-- Verwijder Account -->
 
-      if (!isAdmin()) {
+    <form id="deleteUserForm" class="container" style="display: none">
+
+      <div class="mb-3">
+        <label for="delete-user-email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="delete-user-email" />
+      </div>
+
+      <div class="mb-3">
+        <label for="delete-user-password" class="form-label">Wachtwoord</label>
+        <input type="password" class="form-control" id="delete-user-password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <script>
+      if (!isFrontdesk()) {
         window.location.href = '/index.html';
       }
 
@@ -102,6 +122,7 @@
           "changePasswordForm",
           "changeEmailForm",
           "changePhoneNumberForm",
+          "deleteUserForm",
         ];
 
         // Loop through all form IDs
@@ -122,8 +143,6 @@
         });
       }
 
-      
-
       // voor de submit button van het changePasswordForm
       document
         .getElementById("changePasswordForm")
@@ -132,6 +151,7 @@
           changePassword();
         });
 
+    
       function changePassword() {
         const confirmNewPassword = document.getElementById(
           "confirm-new-password"
@@ -241,8 +261,51 @@
           .catch((error) => console.error("Error fetching users:", error));
         // */
       }
-    </script>
 
-  </div>
+      // for the deleteUserForm Submit Button
+
+      document
+        .getElementById("deleteUserForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          deleteUser();
+        });
+
+    
+      function deleteUser() {
+        const formData = {
+          password: document.getElementById("delete-user-password").value,
+          email: document.getElementById("delete-user-email").value,
+        };
+
+        fetch("http://localhost:8080/user/deleteUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("WT_TOKEN"),
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => {
+          if (response.ok) {
+            clearLocalStorage();
+            alert("User deleted successfully");
+            window.location.href = "index.html";  // Redirect to index.html
+          } else {
+            alert("Invalid email or password");
+          }
+          })
+          .catch((error) => console.error("Error fetching users:", error));
+        // */
+      }
+
+      
+
+    function clearLocalStorage() {
+        localStorage.clear();
+      }
+
+    </script>
+    </div>
   </body>
 </html>

@@ -1,0 +1,262 @@
+@font-face {
+    font-family: "Euclid";
+    src: url("https://fontsforyou.com/fonts/e/Euclid.ttf");
+}
+
+body {
+    font-family: "Euclid";
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.login-container {
+    align-items: center;
+    margin-top: 10%;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.noHover{
+    pointer-events: none;
+}
+
+.dashboard-container {
+    align-items: center;
+    margin-top: 5%;
+    width: 80%;
+    margin-bottom: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.verzoeken-table th:first-child, .verzoeken-table td:first-child,
+.reservering-table th:first-child, .reservering-table td:first-child,
+.uitleen-table th:first-child, .uitleen-table td:first-child,
+.recente-reviews-table th:first-child, .recente-reviews-table td:first-child {
+    width: 10%; /* Adjust the width as needed */
+}
+
+.verzoeken-table th:not(:first-child), .verzoeken-table td:not(:first-child),
+.reservering-table th:not(:first-child), .reservering-table td:not(:first-child),
+.uitleen-table th:not(:first-child), .uitleen-table td:not(:first-child),
+.recente-reviews-table th:not(:first-child), .recente-reviews-table td:not(:first-child) {
+    width: 30%; /* Adjust the width as needed */
+}
+
+.login-margins{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.title {
+    color: black
+}
+
+.wt-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #00E600;
+    text-align: center;
+    margin: 10px;
+    text-decoration: none;
+}
+
+.wt-btn:hover {
+    background-color: #01a801 !important;
+}
+
+.fav-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #131313;
+    text-align: center;
+    color: #00E600;
+}
+
+.fav-btn:hover{
+    color: #01a801 !important;
+}
+
+.bi-heart, 
+.bi-heart-fill{
+    color: #00E600;
+    font-size: large;
+}
+
+.bi-star{
+    font-size: large;
+}
+
+.bi-star-fill{
+    color: #e6e200;
+    font-size: large;
+}
+
+.wt-row{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.bk-pg-im{
+    max-width: 300px;
+    max-height: 350px;
+}
+
+.boek-toevoegen-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #a1e20b;
+    text-align: center;
+}
+
+.verwijder-btn{
+    padding: 12px 20px;
+    justify-content: center;
+    align-items: center;
+    background: #e20b0b;
+    text-align: center;
+}
+    
+.btn-primary {
+    color: #000 !important;
+    background-color: #00E600 !important;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    color: #000 !important;
+    background-color: #6E757C !important;
+}
+
+.btn-greyscale {
+    color: #fff !important;
+    background-color: #737D94 !important;
+}
+
+.btn-greyscale:hover, .btn-greyscale:focus, .btn-greyscale:active, .btn-greyscale.active, .open>.dropdown-toggle.btn-greyscale {
+    color: #fff !important;
+    background-color: #6E757C !important;
+}
+
+.btn-icegrey{
+    color:#fff !important;
+    background-color: #AEB4C1 !important;
+}
+
+.btn-danger{
+    color: #fff !important;
+}
+
+.btn-black{
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
+.btn-black:hover, .btn-black:focus, .btn-black:active, .btn-black.active, .open>.dropdown-toggle.btn-black {
+    color: #fff !important;
+    background-color: #6E757C !important;
+}
+
+.search-margin{
+    margin-right: 20px;
+}
+
+.container {
+    padding: 20px;
+}
+
+.continents-wrap {
+    float:left;
+    width:20%;
+    margin:0 5% 0 0;
+    padding:10px;
+}	
+
+.container-side{
+    max-width: 300px;
+    min-width: 150px;
+    background-color: #fff;
+    padding:10px;
+    margin-right: 20px;
+}
+
+.container-left{
+    margin-right: 20px;
+}
+
+.row-side{
+    padding: 10px;
+    margin-right: 20px;
+}
+.row-side p{
+    margin-top: 10px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 20px;
+    width: 300px;
+    min-height: 600px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    margin-top: 15px;
+}
+
+.card h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.card p {
+    margin: 10px 0;
+}
+
+.card-title{
+    width: 200px;
+    height: 100px;
+}
+
+.card-img-top{
+    width: 300px;
+    height: 350px;
+}
+
+.user-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10%;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Style the left half for the carousel */
+.user-carousel-container {
+    flex: .5; /* Occupy half of the container's width */
+}
+
+/* Style the right half for additional content */
+.user-content-container {
+    flex: .5; /* Occupy half of the container's width */
+    background-color: #f0f0f0; /* Background color for the content area */
+    padding: 20px; /* Add padding for content */
+}
+
+/* Style the carousel (you can use your carousel component here) */
+.user-carousel {
+    width: 100%;
+}
+
+.user-home-header{
+    align-items: center;
+    margin-top: 10%;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
